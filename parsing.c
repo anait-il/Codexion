@@ -13,8 +13,10 @@ int	is_valid(char *av[])
 		{
 			while (av[i][y] != '\0')
 			{
-				if (av[i][0] == '+' || av[i][0] == '-')
+				if ((av[i][y] == '+' || av[i][y] == '-') && y == 0)
 					y++;
+				if (av[i][y] == '\0')
+					return (i);
 				if (!ft_isdigit(av[i][y]))
 					return (i);
 				y++;
@@ -36,10 +38,9 @@ int	is_valid(char *av[])
 	return (0);
 }
 
-int	parsing(int ac, char *av[])
+int	parsing(int ac, char *av[], t_args *data)
 {
-	t_args	arguments;
-	int		parsing_stat;
+	int	parsing_stat;
 
 	if (ac != 9)
 	{
@@ -52,13 +53,13 @@ int	parsing(int ac, char *av[])
 		fprintf(stderr, "Error: invalid argument '%s'", av[parsing_stat]);
 		return (1);
 	}
-	arguments.number_of_coders = ft_atoi(av[1]);
-	arguments.time_to_burnout = ft_atoi(av[2]);
-	arguments.time_to_compile = ft_atoi(av[3]);
-	arguments.time_to_debug = ft_atoi(av[4]);
-	arguments.time_to_refactor = ft_atoi(av[5]);
-	arguments.number_of_compiles_required = ft_atoi(av[6]);
-	arguments.dongle_cooldown = ft_atoi(av[7]);
-	arguments.scheduler = av[8];
+	data->number_of_coders = ft_atoi(av[1]);
+	data->time_to_burnout = ft_atoi(av[2]);
+	data->time_to_compile = ft_atoi(av[3]);
+	data->time_to_debug = ft_atoi(av[4]);
+	data->time_to_refactor = ft_atoi(av[5]);
+	data->number_of_compiles_required = ft_atoi(av[6]);
+	data->dongle_cooldown = ft_atoi(av[7]);
+	data->scheduler = av[8];
 	return (0);
 }

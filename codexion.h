@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
+
 typedef struct s_args
 {
 	int			number_of_coders;
@@ -16,7 +17,22 @@ typedef struct s_args
 	char		*scheduler;
 }				t_args;
 
-long long		ft_atoi(char *str);
-int				is_valid(char *av[]);
-int				parsing(int ac, char *av[]);
-int				ft_isdigit(int i);
+typedef struct s_coder
+{
+	int			id;
+	pthread_t	thread;
+}				t_coder;
+
+typedef struct s_dongle
+{
+    bool        inuse;
+    long		userid;
+    int         id;
+}               t_dongle;
+
+long long	ft_atoi(char *str);
+int			parsing(int ac, char *av[]);
+int			is_valid(char *av[]);
+int			ft_isdigit(int i);
+int	setup_coders(t_args data, t_coder *coders[]);
+int	join_coders(t_args data, t_coder* coders[]);
