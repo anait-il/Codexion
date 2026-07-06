@@ -11,10 +11,14 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-
 int simulation(t_coder *coder)
 {
-    t_program *program = coder->program;
-    
+    return (0);
+}
+
+int all_thread_ready(t_coder coder)
+{
+    if (coder.id == coder.program.data.number_of_coders)
+        return (1);
     return (0);
 }

@@ -25,7 +25,6 @@ void    debug(t_coder *coder)
     t_program *program = coder->program;
     printf("%d is debugging", coder->id);
     usleep(program->data.time_to_debug);
-
 }
 
 void    refactore(t_coder *coder)
@@ -55,20 +54,35 @@ int    setup_dongles(t_program *program)
     return (0);
 }
 
+void    take_dongles(t_coder *coder)
+{
+    
+}
+ 
 void	*code_routine(void *arg)
 {
-    bool flag = true;
+    t_coder *coder;
+    bool    flag;
+
+
+    flag = true;
+    coder = (t_coder*)arg;
+    if (!all_thread_ready(*coder))
+        usleep(10);
     while (flag)
     {
-        t_coder *coder = (t_coder*)arg;
-        simulation(coder);
-        pthread_mutex_lock(&coder->program->my_mutex);
+        take_dongles(coder);
         compile(coder);
-        pthread_mutex_unlock(&coder->program->my_mutex);
         debug(coder);
         refactore(coder);
     }
     return (NULL);
+}
+
+void    assign_dongles(t_coder *coder, t_program *program, int counter)
+{
+    coder->left = &program->dongles[counter - 1];
+    coder->right = &program->dongles[counter % program->data.number_of_coders];
 }
 
 int	setup_coders(t_program program)
@@ -78,9 +92,10 @@ int	setup_coders(t_program program)
 	pthread_t	t[program.data.number_of_coders];
 
 	i = 0;
-	while (i < program.data.number_of_coders)
+	while (++i < program.data.number_of_coders)
 	{
 		program.coders[i].id = i;
+        assign_dongles(&program.coders[i], &program, i);
 		status = pthread_create(&t[i], NULL, code_routine, &program.coders[i]);
 		if (status)
 		{
@@ -89,8 +104,7 @@ int	setup_coders(t_program program)
 			return (i);
 		}
 		program.coders[i].thread = t[i];
-		i++;
-	}
+    }
 	return (0);
 }
 
