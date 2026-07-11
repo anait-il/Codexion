@@ -63,6 +63,7 @@ void    acquire_dongle(t_coder *coder, t_dongle *dongle)
     pthread_mutex_lock(&mutex);
 
     //add coder to wait queue;
+
 }
 
 void	*code_routine(void *arg)

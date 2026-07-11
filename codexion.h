@@ -45,7 +45,15 @@ typedef struct s_heap
 {
     struct s_coder   *arr;
     int             size;
+    int             capacity;
 }                   t_heap;
+
+typedef struct s_waiter
+{
+    int     coder_id;
+    long    arrival_time;
+    long    deadline;
+}           t_waiter;
 
 typedef struct s_program
 {
