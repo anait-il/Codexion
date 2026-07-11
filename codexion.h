@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 typedef struct s_args
@@ -21,8 +22,9 @@ typedef struct s_coder
 {
 	int					id;
 	pthread_t			thread;
+	pthread_cond_t		sleep;
 	struct s_program	*program;
-	long				counter;
+	int					counter;
 	long				last_compile;
 	struct s_dongle		*left;
 	struct s_dongle		*right;
@@ -34,16 +36,27 @@ typedef struct s_dongle
 	bool				inuse;
 	long				userid;
 	int					id;
+    long                coldown;
 	pthread_mutex_t		mutex;
 	struct s_program	*program;
 }						t_dongle;
 
+typedef struct s_heap
+{
+    struct s_coder   *arr;
+    int             size;
+}                   t_heap;
+
 typedef struct s_program
 {
+	int					running;
+	pthread_t			monitor;
+    long                start_time;
 	t_args				data;
 	t_coder				*coders;
 	t_dongle			*dongles;
 	pthread_mutex_t		my_mutex;
+    pthread_mutex_t     print_lock;
 }						t_program;
 
 long long				ft_atoi(char *str);
@@ -57,5 +70,5 @@ int						clean_up(t_program program);
 int						clean_threads(t_program program, int coders_counter);
 int						simulation(t_coder *coder);
 int						all_thread_ready(t_coder coder);
-
-
+long					get_time_ms(void);
+long					get_elapsed_ms(long start);

@@ -11,10 +11,11 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <pthread.h>
 
 void    compile(t_coder *coder)
 {
+    pthread_t           monitor;
+
     t_program *program = coder->program;
     printf("%d is compiling", coder->id);
     usleep(program->data.time_to_compile);
@@ -39,7 +40,7 @@ int    setup_dongles(t_program *program)
     int     i;
     t_args  arguments;
 
-    i = 0;
+    i = 0; 
     program->dongles = malloc(sizeof(t_dongle) * arguments.number_of_coders);
     if (!program->dongles)
         return (1);
@@ -54,29 +55,33 @@ int    setup_dongles(t_program *program)
     return (0);
 }
 
-void    take_dongles(t_coder *coder)
+void    acquire_dongle(t_coder *coder, t_dongle *dongle)
 {
-    
+    pthread_mutex_t mutex;
+
+    mutex = coder->program->my_mutex;
+    pthread_mutex_lock(&mutex);
+
+    //add coder to wait queue;
 }
- 
+
 void	*code_routine(void *arg)
 {
     t_coder *coder;
     bool    flag;
 
-
     flag = true;
     coder = (t_coder*)arg;
     if (!all_thread_ready(*coder))
-        usleep(10);
+        
     while (flag)
     {
-        take_dongles(coder);
+        //acquire_dongle(coder);
         compile(coder);
         debug(coder);
         refactore(coder);
     }
-    return (NULL);
+    return(NULL);
 }
 
 void    assign_dongles(t_coder *coder, t_program *program, int counter)
@@ -104,6 +109,7 @@ int	setup_coders(t_program program)
 			return (i);
 		}
 		program.coders[i].thread = t[i];
+        pthread_cond_init(&program.coders[i].sleep, NULL);
     }
 	return (0);
 }

@@ -1,0 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   logs.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/11 14:36:31 by anait-il          #+#    #+#             */
+/*   Updated: 2026/07/11 14:36:32 by anait-il         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
+#include "codexion.h"
+
+int log_state(t_coder   *coder, char *message)
+{
+    long    timestamp;
+
+    pthread_mutex_lock(&coder->program->print_lock);
+    timestamp = get_time_ms();
+    printf("%ld %d %s", timestamp, coder->id, message);
+    pthread_mutex_unlock(&coder->program->print_lock);
+    return (0);
+}
+
+void    log_burnout(t_program *program, int coder_id)
+{
+    long long   timestamp;
+
+    pthread_mutex_lock(&program->print_lock);
+    timestamp = get_time_ms() - program->start_time;
+    printf("%lld %d burned out\n", timestamp, coder_id);
+    pthread_mutex_unlock(&program->print_lock);
+}

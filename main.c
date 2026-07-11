@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <pthread.h>
 
 int	main(int ac, char *av[])
 {
@@ -25,6 +24,7 @@ int	main(int ac, char *av[])
 	if (!program.coders)
 		return (1);
     pthread_mutex_init(&program.my_mutex, NULL);
+    pthread_mutex_init(&program.print_lock, NULL);
     state = setup_dongles(&program);
     if (!state)
     {
