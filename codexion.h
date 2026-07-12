@@ -29,6 +29,8 @@ typedef struct s_coder
 	struct s_dongle		*left;
 	struct s_dongle		*right;
 	bool				full;
+	long				arrival_time;
+	long				deadline;
 }						t_coder;
 
 typedef struct s_dongle
@@ -36,35 +38,29 @@ typedef struct s_dongle
 	bool				inuse;
 	long				userid;
 	int					id;
-    long                coldown;
+	long				coldown;
 	pthread_mutex_t		mutex;
 	struct s_program	*program;
 }						t_dongle;
 
 typedef struct s_heap
 {
-    struct s_coder   *arr;
-    int             size;
-    int             capacity;
-}                   t_heap;
-
-typedef struct s_waiter
-{
-    int     coder_id;
-    long    arrival_time;
-    long    deadline;
-}           t_waiter;
+	struct s_coder		**arr;
+	int					size;
+	int					capacity;
+	struct s_program	*program;
+}						t_heap;
 
 typedef struct s_program
 {
 	int					running;
 	pthread_t			monitor;
-    long                start_time;
+	long				start_time;
 	t_args				data;
 	t_coder				*coders;
 	t_dongle			*dongles;
 	pthread_mutex_t		my_mutex;
-    pthread_mutex_t     print_lock;
+	pthread_mutex_t		print_lock;
 }						t_program;
 
 long long				ft_atoi(char *str);

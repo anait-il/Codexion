@@ -9,22 +9,24 @@ void    swap(t_coder *c1, t_coder *c2)
     *c2 = tmp;
 }
 
-int has_priority(t_waiter a, t_waiter b, char *schedular)
+int has_priority(t_coder *a, t_coder *b, char *schedular)
 {
     if (strcmp(schedular, "edf") == 0)
-        return (a.deadline < b.deadline);
-    return (a.arrival_time < b.arrival_time);
+        return (a->deadline < b->deadline);
+    return (a->arrival_time < b->arrival_time);
 }
 
-void    bubble_up(t_heap *heap)
+void    bubble_up(t_heap *heap, char *schedular)
 {
     int i;
+    int parent;
 
     i = heap->size - 1;
-    while (i != 0 && has_priority()
+    parent = (i - 1) / 2;
+    while (has_priority(heap->arr[i], heap->arr[parent], schedular))
     {
-        swap(&heap->arr[i], &heap->arr[(i - 1) / 2]);
-        i--;
+        swap(heap->arr[i], heap->arr[parent]);
+        i = parent;
     }
 }
 
@@ -41,9 +43,9 @@ int heap_push(t_heap *heap, t_coder *coder)
         return (1);
     }
     i = 0;
-    heap->arr[heap->size - 1] = *coder;
+    heap->arr[heap->size - 1] = coder;
     heap->size++;
-    bubble_up(heap);
+    bubble_up(heap, coder->program->data.scheduler);
     return (0);
 }
 
