@@ -1,8 +1,8 @@
 #include "codexion.h"
 
-void    swap(t_coder *c1, t_coder *c2)
+void    swap(t_coder **c1, t_coder **c2)
 {
-    t_coder     tmp;
+    t_coder     *tmp;
 
     tmp = *c1;
     *c1 = *c2;
@@ -23,29 +23,30 @@ void    bubble_up(t_heap *heap, char *schedular)
 
     i = heap->size - 1;
     parent = (i - 1) / 2;
-    while (has_priority(heap->arr[i], heap->arr[parent], schedular))
+    while (i != 0 || has_priority(heap->arr[i], heap->arr[parent], schedular))
     {
-        swap(heap->arr[i], heap->arr[parent]);
+        swap(&heap->arr[i], &heap->arr[parent]);
         i = parent;
+        parent = (i - 1) / 2;
     }
 }
 
 int heap_push(t_heap *heap, t_coder *coder)
 {
-    int i;
     t_coder *arr;
 
-    if (!coder || !arr)
+    if (!heap || !coder || !heap->arr)
         return (1);
-    if (heap->size == heap->capacity)
+    if (heap->size >= heap->capacity)
     {
         fprintf(stderr,"Heap overflow");
         return (1);
     }
-    i = 0;
-    heap->arr[heap->size - 1] = coder;
+    heap->arr[heap->size] = coder;
     heap->size++;
     bubble_up(heap, coder->program->data.scheduler);
     return (0);
 }
+
+
 
