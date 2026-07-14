@@ -56,15 +56,55 @@ int can_take(t_dongle *dongle, t_coder *coder)
     return (1);
 }
 
-void    acquire_dongle(t_coder *coder, t_dongle *dongle)
+t_dongle    *assign_first(t_coder *coder)
+{
+    if (coder->id % 2 == 0)
+        return (coder->left);
+    return (coder->right);
+}
+
+t_dongle    *assign_second(t_coder *coder)
+{
+    if (coder->id % 2 == 0)
+        return (coder->right);
+    return (coder->left);
+}
+
+int    acquire_dongles(t_coder *coder, t_dongle *dongle)
 {
     int state;
+    t_dongle    *first;
+    t_dongle    *second;
 
-    pthread_mutex_lock(&dongle->lock);
-    state = heap_push(&dongle->heap, coder);
+    first = assign_first(coder);
+    second = assign_second(coder);
+    pthread_mutex_lock(&first->lock);
+    pthread_mutex_lock(&second->lock);
+    state = heap_push(&first->heap, coder);
+    if (state)
+        return (1);
+    state = heap_push(&second->heap, coder);
+    if (state)
+        return (1);
+    while(!can_take(first, coder))
+        pthread_cond_wait(&first->cond, &first->lock);
+    while(!can_take(second, coder))
+        pthread_cond_wait(&second->cond, &second->lock);
+    heap_pop(&first->heap);
+    heap_pop(&second->heap);
+    first->available = false;
+    second->available = false;
+    return (0);
+}
 
-    //add coder to wait queue;
-
+void    release_dongles(t_coder *coder)
+{
+    if (!coder)
+        return ;
+    coder->left->available = true;
+    coder->left->release_time = get_time_ms();
+    coder->right->available = true;
+    coder->right->release_time = get_time_ms();
 }
 
 void    assign_dongles(t_coder *coder, t_program *program, int counter)

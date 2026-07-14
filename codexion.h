@@ -43,7 +43,6 @@ typedef struct s_coder
 
 typedef struct s_dongle
 {
-	bool				inuse;
 	long				available;
 	int					id;
 	struct s_heap		heap;

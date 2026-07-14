@@ -27,9 +27,7 @@ static void	bubble_up(t_heap *heap, char *schedular)
 	{
 		swap(&heap->arr[i], &heap->arr[parent]);
 		i = parent;
-		parent = (i - 1) / 2;
-	}
-}
+		parent = (i - 1) / 2; } }
 
 static void	bubble_down(t_heap *heap, char *schedular)
 {
