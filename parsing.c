@@ -65,7 +65,6 @@ int	parsing(int ac, char *av[], t_program *program)
 		fprintf(stderr, "Error: invalid argument '%s'", av[parsing_stat]);
 		return (1);
 	}
-    printf("%s number of coders", av[1]);
 	program->data.number_of_coders = ft_atoi(av[1]);
 	program->data.time_to_burnout = ft_atoi(av[2]);
 	program->data.time_to_compile = ft_atoi(av[3]);

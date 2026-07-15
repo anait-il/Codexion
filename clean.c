@@ -17,6 +17,7 @@ int	clean_up(t_program *program)
 	int	i;
 
 	i = 0;
+    free(program->dongles);
 	free(program->coders);
 	return (0);
 }

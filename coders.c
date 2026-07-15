@@ -60,15 +60,18 @@ int	setup_coders(t_program *program)
 	pthread_t	t[program->data.number_of_coders];
 
 	i = 0;
+    program->number_of_coders = 0;
     program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
 	if (!program->coders)
 		return (1);
 	while (++i < program->data.number_of_coders)
 	{
+        printf("first line\n");
 		program->coders[i].id = i;
-        program->number_of_coders = i;
+        program->number_of_coders++;
         assign_dongles(&program->coders[i], program, i);
 		status = pthread_create(&t[i], NULL, coder_routine, &program->coders[i]);
+        printf("after pthread creat\n");
 		if (status)
 		{
 			fprintf(stderr, "Thread %d creation failed with code %d", i,

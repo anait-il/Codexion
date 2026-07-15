@@ -34,24 +34,21 @@ int	main(int ac, char *av[])
 	if (state == 1)
 		return (1);
     state = init_mutex(&program);
-    printf("i am here\n");
     state = setup_dongles(&program);
-    if (!state)
-    {
-        clean_up(&program);
-        return (1);
-    }
+    if (state)
+        return (7);
 	state = setup_coders(&program);
 	if (state)
 	{
 		clean_threads(&program, state);
 		return (1);
 	}
-	state = join_coders(program);
+    state = join_coders(program);
 	if (state)
 	{
 		clean_up(&program);
 		return (1);
 	}
+    clean_up(&program);
     return (0);
 }

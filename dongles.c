@@ -33,7 +33,10 @@ int	setup_dongles(t_program *program)
 		program->dongles[i].heap.arr = malloc(sizeof(t_coder *)
 				* program->data.number_of_coders);
 		if (!program->dongles[i].heap.arr)
-			return (1);
+        {
+            free(program->dongles);
+            return (1);
+        }
 		i++;
 	}
 	return (0);
@@ -124,6 +127,7 @@ void	release_dongles(t_coder *coder)
 
 void	assign_dongles(t_coder *coder, t_program *program, int counter)
 {
+    printf("inside assign dongles\n");
 	coder->left = &program->dongles[counter - 1];
 	coder->right = &program->dongles[counter % program->data.number_of_coders];
 }
