@@ -32,11 +32,10 @@ typedef struct s_coder
 	pthread_t			thread;
 	pthread_cond_t		sleep;
 	struct s_program	*program;
-	int					counter;
-	long				last_compile;
+	int					compile_counter;
+	long				last_compile_time;
 	struct s_dongle		*left;
 	struct s_dongle		*right;
-	bool				full;
 	long				arrival_time;
 	long				deadline;
 }						t_coder;
@@ -80,3 +79,4 @@ long					get_elapsed_ms(long start);
 int						heap_push(t_heap *heap, t_coder *coder);
 t_coder					*heap_pop(t_heap *heap);
 t_coder					*heap_top(t_heap *heap);
+void                    assign_dongles(t_coder *coder, t_program *program, int counter);

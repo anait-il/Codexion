@@ -76,6 +76,8 @@ int	setup_coders(t_program *program)
 		}
 		program->coders[i].thread = t[i];
         pthread_cond_init(&program->coders[i].sleep, NULL);
+        program->coders[i].compile_counter = 0;
+        program->coders[i].last_compile_time = 0;
     }
 	return (0);
 }
