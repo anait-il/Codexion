@@ -29,7 +29,7 @@ long long	ft_atoi(char *str)
 	if (str[i] == '-' || str[i] == '+')
 	{
 		if (str[i] == '-')
-			return (-1);
+			sign = -1;
 		i++;
 	}
 	while (str[i] != '\0')
@@ -41,9 +41,11 @@ long long	ft_atoi(char *str)
 	}
 	res = res * sign;
 	if (res < 0)
+    {
 		fprintf(stderr, "Error: negative number not allowed '%lld'", res);
 	    return (-1);
-	return (res * sign);
+    }
+	return (res);
 }
 
 int	ft_isdigit(int i)

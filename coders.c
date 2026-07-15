@@ -14,25 +14,22 @@
 
 void    compile(t_coder *coder)
 {
-    pthread_t           monitor;
-
-    t_program *program = coder->program;
-    printf("%d is compiling", coder->id);
-    usleep(program->data.time_to_compile);
+    coder->compile_counter++;
+    coder->last_compile_time = get_time_ms();
+    log_state(coder, "is compiling");
+    usleep(coder->program->data.time_to_compile);
 }
 
 void    debug(t_coder *coder)
 {
-    t_program *program = coder->program;
-    printf("%d is debugging", coder->id);
-    usleep(program->data.time_to_debug);
+    log_state(coder, "is debugging");
+    usleep(coder->program->data.time_to_compile);
 }
 
 void    refactore(t_coder *coder)
 {
-    t_program *program = coder->program;
-    printf("%d is refactoring", coder->id);
-    usleep(program->data.time_to_refactor);
+    log_state(coder, "is refactoring");
+    usleep(coder->program->data.time_to_compile);
 }
 
 int all_thread_ready(t_program program)
@@ -48,11 +45,11 @@ void	*coder_routine(void *arg)
 
     coder = (t_coder*)arg;
     while (!all_thread_ready(*coder->program))
-        usleep(1000);
+        usleep(100);
     acquire_dongles(coder);
     compile(coder);
     debug(coder);
-    
+    refactore(coder);
     return (NULL);
 }
 

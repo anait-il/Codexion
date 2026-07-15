@@ -15,14 +15,12 @@
 int	setup_dongles(t_program *program)
 {
 	int		i;
-	t_args	arguments;
 
 	i = 0;
-	arguments = program->data;
-	program->dongles = malloc(sizeof(t_dongle) * arguments.number_of_coders);
+	program->dongles = malloc(sizeof(t_dongle) * program->data.number_of_coders);
 	if (!program->dongles)
 		return (1);
-	while (i < arguments.number_of_coders)
+	while (i < program->data.number_of_coders)
 	{
 		pthread_mutex_init(&program->dongles[i].lock, NULL);
 		pthread_cond_init(&program->dongles[i].cond, NULL);
@@ -31,9 +29,9 @@ int	setup_dongles(t_program *program)
 		program->dongles[i].available = true;
 		program->dongles[i].heap.size = 0;
 		program->dongles[i].heap.program = program;
-		program->dongles[i].heap.capacity = arguments.number_of_coders;
+		program->dongles[i].heap.capacity = program->data.number_of_coders;
 		program->dongles[i].heap.arr = malloc(sizeof(t_coder *)
-				* arguments.number_of_coders);
+				* program->data.number_of_coders);
 		if (!program->dongles[i].heap.arr)
 			return (1);
 		i++;
@@ -64,7 +62,7 @@ static t_dongle	*assign_first(t_coder *coder)
 	return (coder->right);
 }
 
-t_dongle	*assign_second(t_coder *coder)
+static t_dongle	*assign_second(t_coder *coder)
 {
 	if (coder->id % 2 == 0)
 		return (coder->right);
@@ -101,8 +99,8 @@ int	acquire_dongles(t_coder *coder)
 	state = acquire_one(second, coder);
 	if (state)
 		return (1);
-    heap_pop(&first->heap);
-    heap_pop(&second->heap);
+    log_state(heap_pop(&first->heap), "has taken a dongle");
+    log_state(heap_pop(&second->heap), "has taken a dongle");
     first->available = false;
     second->available = false;
 	return (0);
@@ -112,6 +110,8 @@ void	release_dongles(t_coder *coder)
 {
 	if (!coder)
 		return ;
+    coder->left->release_time = get_time_ms();
+    coder->right->release_time = get_time_ms();
 	coder->left->available = true;
 	coder->left->release_time = get_time_ms();
 	coder->right->available = true;

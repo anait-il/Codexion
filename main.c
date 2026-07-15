@@ -30,26 +30,27 @@ int	main(int ac, char *av[])
 	int			state;
 	t_program	program;
 
-	state = parsing(ac, av, &program.data);
+	state = parsing(ac, av, &program);
 	if (state == 1)
 		return (1);
     state = init_mutex(&program);
+    printf("i am here\n");
     state = setup_dongles(&program);
     if (!state)
     {
-        clean_up(program);
+        clean_up(&program);
         return (1);
     }
 	state = setup_coders(&program);
 	if (state)
 	{
-		clean_threads(program, state);
+		clean_threads(&program, state);
 		return (1);
 	}
 	state = join_coders(program);
 	if (state)
 	{
-		clean_up(program);
+		clean_up(&program);
 		return (1);
 	}
     return (0);

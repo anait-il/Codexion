@@ -12,16 +12,16 @@
 
 #include "codexion.h"
 
-int	clean_up(t_program program)
+int	clean_up(t_program *program)
 {
 	int	i;
 
 	i = 0;
-	free(program.coders);
+	free(program->coders);
 	return (0);
 }
 
-int	clean_threads(t_program program, int coders_counter)
+int	clean_threads(t_program *program, int coders_counter)
 {
 	int	i;
 	int	status;
@@ -29,7 +29,7 @@ int	clean_threads(t_program program, int coders_counter)
 	i = 0;
 	while (i < coders_counter)
 	{
-		status = pthread_join(program.coders[i].thread, NULL);
+		status = pthread_join(program->coders[i].thread, NULL);
 		if (status)
 		{
 			fprintf(stderr, "Thread %d join failed with code %d", i, status);

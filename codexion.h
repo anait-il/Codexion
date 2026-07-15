@@ -65,14 +65,14 @@ typedef struct s_program
 }						t_program;
 
 long long				ft_atoi(char *str);
-int						parsing(int ac, char *av[], t_args *data);
+int						parsing(int ac, char *av[], t_program *program);
 int						is_valid(char *av[]);
 int						ft_isdigit(int i);
 int						setup_dongles(t_program *program);
 int						setup_coders(t_program *program);
 int						join_coders(t_program program);
-int						clean_up(t_program program);
-int						clean_threads(t_program program, int coders_counter);
+int						clean_up(t_program *program);
+int						clean_threads(t_program *program, int coders_counter);
 int						simulation(t_coder *coder);
 int						all_thread_ready(t_program program);
 long					get_time_ms(void);
@@ -83,3 +83,5 @@ t_coder					*heap_top(t_heap *heap);
 int                     acquire_dongles(t_coder *coder);
 void                    release_dongles(t_coder *coder);
 void                    assign_dongles(t_coder *coder, t_program *program, int counter);
+int                     log_state(t_coder   *coder, char *message);
+void                    log_burnout(t_program *program, int coder_id);
