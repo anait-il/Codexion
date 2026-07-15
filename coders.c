@@ -35,21 +35,24 @@ void    refactore(t_coder *coder)
     usleep(program->data.time_to_refactor);
 }
 
-void	*code_routine(void *arg)
+int all_thread_ready(t_program program)
+{
+    if (program.number_of_coders == program.data.number_of_coders)
+        return (1);
+    return (0);
+}
+
+void	*coder_routine(void *arg)
 {
     t_coder *coder;
-    bool    flag;
 
-    flag = true;
     coder = (t_coder*)arg;
-    if (!all_thread_ready(*coder))
-    while (flag)
-    {
-        //acquire_dongle(coder);
-        compile(coder);
-        debug(coder);
-        refactore(coder);
-    }
+    while (!all_thread_ready(*coder->program))
+        usleep(1000);
+    acquire_dongles(coder);
+    compile(coder);
+    debug(coder);
+    
     return (NULL);
 }
 
@@ -66,8 +69,9 @@ int	setup_coders(t_program *program)
 	while (++i < program->data.number_of_coders)
 	{
 		program->coders[i].id = i;
+        program->number_of_coders = i;
         assign_dongles(&program->coders[i], program, i);
-		status = pthread_create(&t[i], NULL, code_routine, &program->coders[i]);
+		status = pthread_create(&t[i], NULL, coder_routine, &program->coders[i]);
 		if (status)
 		{
 			fprintf(stderr, "Thread %d creation failed with code %d", i,

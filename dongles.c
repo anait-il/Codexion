@@ -41,7 +41,7 @@ int	setup_dongles(t_program *program)
 	return (0);
 }
 
-int	can_take(t_dongle *dongle, t_coder *coder)
+static int	can_take(t_dongle *dongle, t_coder *coder)
 {
 	long	now;
 
@@ -57,7 +57,7 @@ int	can_take(t_dongle *dongle, t_coder *coder)
 	return (1);
 }
 
-t_dongle	*assign_first(t_coder *coder)
+static t_dongle	*assign_first(t_coder *coder)
 {
 	if (coder->id % 2 == 0)
 		return (coder->left);
@@ -71,7 +71,7 @@ t_dongle	*assign_second(t_coder *coder)
 	return (coder->left);
 }
 
-int	acquire_one(t_dongle *dongle, t_coder *coder)
+static int	acquire_one(t_dongle *dongle, t_coder *coder)
 {
 	int		state;
 	t_coder	*status;
