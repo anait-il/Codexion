@@ -59,7 +59,6 @@ typedef struct s_program
 	t_args				data;
 	t_coder				*coders;
 	t_dongle			*dongles;
-    int                 number_of_coders;
 	pthread_mutex_t		my_mutex;
 	pthread_mutex_t		print_lock;
 }						t_program;
@@ -74,7 +73,7 @@ int						join_coders(t_program program);
 int						clean_up(t_program *program);
 int						clean_threads(t_program *program, int coders_counter);
 int						simulation(t_coder *coder);
-int						all_thread_ready(t_program program);
+int						all_thread_ready(t_coder *coder);
 long					get_time_ms(void);
 long					get_elapsed_ms(long start);
 int						heap_push(t_heap *heap, t_coder *coder);

@@ -41,7 +41,7 @@ int	main(int ac, char *av[])
 	if (state)
 	{
 		clean_threads(&program, state);
-		return (1);
+		return (8);
 	}
     state = join_coders(program);
 	if (state)

@@ -51,8 +51,11 @@ static int	can_take(t_dongle *dongle, t_coder *coder)
 	if (!dongle->available)
 		return (0);
 	now = get_time_ms();
+	printf("[now: %ld, release_time: %ld < dongle_cooldown: %lld] = %ld\n", now,  dongle->release_time, coder->program->data.dongle_cooldown , now - dongle->release_time);
 	if (now - dongle->release_time < coder->program->data.dongle_cooldown)
+	{
 		return (0);
+	}
 	if (heap_top(&dongle->heap) != coder)
 		return (0);
 	return (1);
@@ -83,8 +86,16 @@ static int	acquire_one(t_dongle *dongle, t_coder *coder)
 	state = heap_push(&dongle->heap, coder);
 	if (state)
 		return (1);
-	while (!can_take(dongle, coder))
+	printf("coder %d tries to lock dongle %d\n", coder->id, dongle->id);
+	while (true)
+	{
+		int state = can_take(dongle, coder);
+		printf("coder %d , dongle %d => state {%d}\n",coder->id , dongle->id, state);
+		if (state)
+			break;
 		pthread_cond_wait(&dongle->cond, &dongle->lock);
+	}
+	printf("coder %d success to lock dongle %d\n", coder->id, dongle->id);
     return (0);
 }
 
@@ -102,8 +113,8 @@ int	acquire_dongles(t_coder *coder)
 	state = acquire_one(second, coder);
 	if (state)
 		return (1);
-    log_state(heap_pop(&first->heap), "has taken a dongle");
-    log_state(heap_pop(&second->heap), "has taken a dongle");
+    log_state(heap_pop(&first->heap), "has taken a dongle\n");
+    log_state(heap_pop(&second->heap), "has taken a dongle\n");
     first->available = false;
     second->available = false;
 	return (0);
@@ -119,15 +130,15 @@ void	release_dongles(t_coder *coder)
 	coder->left->release_time = get_time_ms();
 	coder->right->available = true;
 	coder->right->release_time = get_time_ms();
-    pthread_cond_broadcast(&coder->left->cond);
-    pthread_cond_broadcast(&coder->right->cond);
     pthread_mutex_unlock(&coder->left->lock);
     pthread_mutex_unlock(&coder->right->lock);
+    pthread_cond_broadcast(&coder->left->cond);
+    pthread_cond_broadcast(&coder->right->cond);
+	printf("coder {%d} release dongle {%d, %d}\n", coder->id, coder->left->id,coder->right->id);
 }
 
 void	assign_dongles(t_coder *coder, t_program *program, int counter)
 {
-    printf("inside assign dongles\n");
 	coder->left = &program->dongles[counter - 1];
 	coder->right = &program->dongles[counter % program->data.number_of_coders];
 }

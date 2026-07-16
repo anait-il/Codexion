@@ -4,7 +4,7 @@ CC = cc
 
 FILE = main.c atoi_function.c parsing.c clean.c coders.c dongles.c priority_queue.c logs.c time.c
 
-FLAGS =# -fsanitize=address -g3
+FLAGS = 
 
 OBJ = $(FILE:%.c=%.o)
 
@@ -12,8 +12,8 @@ OBJ = $(FILE:%.c=%.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
-
+	$(CC) $(FLAGS) $(OBJ) -o $(NAME) && make clean
+ 
 %.o: %.c codexion.h
 	$(CC) $(FLAGS) -c $< -o $@
 
