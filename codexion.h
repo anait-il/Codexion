@@ -30,7 +30,6 @@ typedef struct s_coder
 {
 	int					id;
 	pthread_t			thread;
-	pthread_cond_t		sleep;
 	struct s_program	*program;
 	int					compile_counter;
 	long				last_compile_time;
@@ -59,7 +58,7 @@ typedef struct s_program
 	t_args				data;
 	t_coder				*coders;
 	t_dongle			*dongles;
-	pthread_mutex_t		my_mutex;
+	pthread_mutex_t		monitor_lock;
 	pthread_mutex_t		print_lock;
 }						t_program;
 
@@ -73,7 +72,7 @@ int						join_coders(t_program program);
 int						clean_up(t_program *program);
 int						clean_threads(t_program *program, int coders_counter);
 int						simulation(t_coder *coder);
-int						all_thread_ready(t_coder *coder);
+int						all_thread_ready(t_program *program);
 long					get_time_ms(void);
 long					get_elapsed_ms(long start);
 int						heap_push(t_heap *heap, t_coder *coder);
@@ -84,3 +83,7 @@ void                    release_dongles(t_coder *coder);
 void                    assign_dongles(t_coder *coder, t_program *program, int counter);
 int                     log_state(t_coder   *coder, char *message);
 void                    log_burnout(t_program *program, int coder_id);
+void                    free_dongles(t_program *program);
+void                    destroy_mtx_cond(t_program *program);
+int                     start_monitoring(t_program *program);
+

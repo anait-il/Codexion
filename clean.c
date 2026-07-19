@@ -11,13 +11,42 @@
 
 
 #include "codexion.h"
+#include <pthread.h>
+
+void free_dongles(t_program *program)
+{
+    int i;
+
+    i = 0;
+    while (i < program->data.number_of_coders)
+    {
+        free(program->dongles[i].heap.arr);
+        i++;
+    }
+    free(program->dongles);
+}
+
+void    destroy_mtx_cond(t_program *program)
+{
+    int i;
+
+    i = 0;
+    pthread_mutex_destroy(&program->print_lock);
+    pthread_mutex_destroy(&program->monitor_lock);
+    while (i < program->data.number_of_coders)
+    {
+        pthread_mutex_destroy(&program->dongles[i].lock);
+        pthread_cond_destroy(&program->dongles[i].cond);
+		i++;
+    }
+}
 
 int	clean_up(t_program *program)
 {
 	int	i;
 
 	i = 0;
-    free(program->dongles);
+    free_dongles(program);
 	free(program->coders);
 	return (0);
 }

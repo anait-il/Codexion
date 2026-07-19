@@ -14,10 +14,11 @@
 
 int	setup_dongles(t_program *program)
 {
-	int		i;
+	int	i;
 
 	i = 0;
-	program->dongles = malloc(sizeof(t_dongle) * program->data.number_of_coders);
+	program->dongles = malloc(sizeof(t_dongle)
+			* program->data.number_of_coders);
 	if (!program->dongles)
 		return (1);
 	while (i < program->data.number_of_coders)
@@ -33,10 +34,10 @@ int	setup_dongles(t_program *program)
 		program->dongles[i].heap.arr = malloc(sizeof(t_coder *)
 				* program->data.number_of_coders);
 		if (!program->dongles[i].heap.arr)
-        {
-            free(program->dongles);
-            return (1);
-        }
+		{
+			free(program->dongles);
+			return (1);
+		}
 		i++;
 	}
 	return (0);
@@ -51,11 +52,8 @@ static int	can_take(t_dongle *dongle, t_coder *coder)
 	if (!dongle->available)
 		return (0);
 	now = get_time_ms();
-	printf("[now: %ld, release_time: %ld < dongle_cooldown: %lld] = %ld\n", now,  dongle->release_time, coder->program->data.dongle_cooldown , now - dongle->release_time);
 	if (now - dongle->release_time < coder->program->data.dongle_cooldown)
-	{
 		return (0);
-	}
 	if (heap_top(&dongle->heap) != coder)
 		return (0);
 	return (1);
@@ -77,26 +75,27 @@ static t_dongle	*assign_second(t_coder *coder)
 
 static int	acquire_one(t_dongle *dongle, t_coder *coder)
 {
-	int		state;
-	t_coder	*status;
+	int				state;
+	t_coder			*status;
+	long			wake_up;
+	struct timespec	ts;
 
 	pthread_mutex_lock(&dongle->lock);
-    coder->arrival_time = get_time_ms();
-    coder->deadline = coder->last_compile_time + coder->program->data.time_to_burnout;
+	coder->arrival_time = get_time_ms();
+	coder->deadline = coder->last_compile_time
+		+ coder->program->data.time_to_burnout;
 	state = heap_push(&dongle->heap, coder);
 	if (state)
 		return (1);
-	printf("coder %d tries to lock dongle %d\n", coder->id, dongle->id);
-	while (true)
+	while (!can_take(dongle, coder))
 	{
-		int state = can_take(dongle, coder);
-		printf("coder %d , dongle %d => state {%d}\n",coder->id , dongle->id, state);
-		if (state)
-			break;
-		pthread_cond_wait(&dongle->cond, &dongle->lock);
+		wake_up = dongle->release_time + coder->program->data.dongle_cooldown
+			+ 1;
+        ts.tv_sec = wake_up / 1000;
+        ts.tv_nsec = (wake_up % 1000) * 1000000L;
+        pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
 	}
-	printf("coder %d success to lock dongle %d\n", coder->id, dongle->id);
-    return (0);
+	return (0);
 }
 
 int	acquire_dongles(t_coder *coder)
@@ -113,10 +112,8 @@ int	acquire_dongles(t_coder *coder)
 	state = acquire_one(second, coder);
 	if (state)
 		return (1);
-    log_state(heap_pop(&first->heap), "has taken a dongle\n");
-    log_state(heap_pop(&second->heap), "has taken a dongle\n");
-    first->available = false;
-    second->available = false;
+	log_state(heap_pop(&first->heap), "has taken a dongle\n");
+	log_state(heap_pop(&second->heap), "has taken a dongle\n");
 	return (0);
 }
 
@@ -124,17 +121,14 @@ void	release_dongles(t_coder *coder)
 {
 	if (!coder)
 		return ;
-    coder->left->release_time = get_time_ms();
-    coder->right->release_time = get_time_ms();
-	coder->left->available = true;
 	coder->left->release_time = get_time_ms();
-	coder->right->available = true;
 	coder->right->release_time = get_time_ms();
-    pthread_mutex_unlock(&coder->left->lock);
-    pthread_mutex_unlock(&coder->right->lock);
-    pthread_cond_broadcast(&coder->left->cond);
-    pthread_cond_broadcast(&coder->right->cond);
-	printf("coder {%d} release dongle {%d, %d}\n", coder->id, coder->left->id,coder->right->id);
+	coder->left->release_time = get_time_ms();
+	coder->right->release_time = get_time_ms();
+	pthread_mutex_unlock(&coder->left->lock);
+	pthread_mutex_unlock(&coder->right->lock);
+	pthread_cond_broadcast(&coder->left->cond);
+	pthread_cond_broadcast(&coder->right->cond);
 }
 
 void	assign_dongles(t_coder *coder, t_program *program, int counter)

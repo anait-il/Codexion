@@ -11,12 +11,13 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <pthread.h>
 
 int init_mutex(t_program *program)
 {
     int status;
 
-    status = pthread_mutex_init(&program->my_mutex, NULL);
+    status = pthread_mutex_init(&program->monitor_lock, NULL);
     if (status)
         return (1);
     status = pthread_mutex_init(&program->print_lock, NULL);
@@ -30,6 +31,7 @@ int	main(int ac, char *av[])
 	int			state;
 	t_program	program;
 
+    program.running = false;
 	state = parsing(ac, av, &program);
 	if (state == 1)
 		return (1);
@@ -49,6 +51,8 @@ int	main(int ac, char *av[])
 		clean_up(&program);
 		return (1);
 	}
+    destroy_mtx_cond(&program);
+    printf("########### program is finish ##############\n");
     clean_up(&program);
     return (0);
 }
