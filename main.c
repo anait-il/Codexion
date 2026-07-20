@@ -45,14 +45,17 @@ int	main(int ac, char *av[])
 		clean_threads(&program, state);
 		return (8);
 	}
-    state = join_coders(program);
+    state = join_coders(&program);
 	if (state)
 	{
 		clean_up(&program);
 		return (1);
 	}
+    state = pthread_join(program.monitor, NULL);
+    if (state)
+        clean_up(&program);
     destroy_mtx_cond(&program);
-    printf("########### program is finish ##############\n");
     clean_up(&program);
+    printf("########### program is finish ##############\n");
     return (0);
 }

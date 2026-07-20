@@ -16,34 +16,42 @@ pthread_mutex_t mutex;
 
 void    compile(t_coder *coder)
 {
+	pthread_mutex_lock(&coder->program->monitor_lock);
     coder->compile_counter++;
     coder->last_compile_time = get_time_ms();
+	pthread_mutex_unlock(&coder->program->monitor_lock);
     log_state(coder, "is compiling\n");
-    usleep(coder->program->data.time_to_compile);
+    my_sleep(coder->program->data.time_to_compile, coder->program);
+	// usleep(coder->program->data.time_to_compile * 1000);
 }
 
 void    debug(t_coder *coder)
 {
     log_state(coder, "is debugging\n");
-    usleep(coder->program->data.time_to_debug);
+    my_sleep(coder->program->data.time_to_debug, coder->program);
+	// usleep(coder->program->data.time_to_debug * 1000);
 }
 
 void    refactore(t_coder *coder)
 {
     log_state(coder, "is refactoring\n");
-    usleep(coder->program->data.time_to_refactor);
+    my_sleep(coder->program->data.time_to_refactor, coder->program);
+	// usleep(coder->program->data.time_to_refactor * 1000);
 }
 
 int all_thread_ready(t_program *program)
 {
-	bool	running;
+	return (is_running(program));
+}
 
-	pthread_mutex_lock(&program->monitor_lock);
-	running = program->running;
-	pthread_mutex_unlock(&program->monitor_lock);
-	if (running)
-		return (1);
-	return (0);
+bool is_running(t_program *program)
+{
+    bool    status;
+
+    pthread_mutex_lock(&program->monitor_lock);
+    status = program->running;
+    pthread_mutex_unlock(&program->monitor_lock);
+    return (status);
 }
 
 void	*coder_routine(void *arg)
@@ -55,19 +63,28 @@ void	*coder_routine(void *arg)
  	coder = (t_coder*)arg;
     while (!all_thread_ready(coder->program))
         usleep(100);
-	while (coder->program->running)
+
+	while (is_running(coder->program))
 	{
-		state = acquire_dongles(coder);
-		if (state)
-		{	
-			return (NULL);
-		}
-		if (coder->program->running)
+        if (is_running(coder->program))
+        {
+		    state = acquire_dongles(coder);
+            if (state)
+                return (NULL);
+        }
+        if (!is_running(coder->program))
+        {
+            release_dongles(coder);
+            break;
+        }
+		if (is_running(coder->program))
+        {
 			compile(coder);
-			release_dongles(coder);
-		if (coder->program->running)
+		    release_dongles(coder);
+        }
+		if (is_running(coder->program))
 			debug(coder);
-		if (coder->program->running)
+		if (is_running(coder->program))
 			refactore(coder);
 	}
     return (NULL);
@@ -110,20 +127,21 @@ int	setup_coders(t_program *program)
 	return (0);
 }
 
-int	join_coders(t_program program)
+int	join_coders(t_program *program)
 {
 	int	y;
 	int	status;
 
 	y = 0;
-	while (y < program.data.number_of_coders)
+	while (y < program->data.number_of_coders)
 	{
-		status = pthread_join(program.coders[y].thread, NULL);	
+		status = pthread_join(program->coders[y].thread, NULL);	
 		if (status)
 		{
 			fprintf(stderr, "Thread %d join failed with code %d\n", y, status);
 			return (1);
 		}
+        // printf("inside join_coders\n");
 		y++;
 	}
 	return (0);

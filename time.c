@@ -14,3 +14,17 @@ long    get_elapsed_ms(long start)
 {
     return (get_time_ms() - start);
 }
+
+
+void my_sleep(long time, t_program *program)
+{
+    long    start;
+
+    start = get_time_ms();
+    while (get_time_ms() - start < time)
+    {
+        usleep((time/10) * 1000);
+        if (!is_running(program))
+            return;
+    }
+}

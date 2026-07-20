@@ -68,7 +68,7 @@ int						is_valid(char *av[]);
 int						ft_isdigit(int i);
 int						setup_dongles(t_program *program);
 int						setup_coders(t_program *program);
-int						join_coders(t_program program);
+int						join_coders(t_program *program);
 int						clean_up(t_program *program);
 int						clean_threads(t_program *program, int coders_counter);
 int						simulation(t_coder *coder);
@@ -86,4 +86,6 @@ void                    log_burnout(t_program *program, int coder_id);
 void                    free_dongles(t_program *program);
 void                    destroy_mtx_cond(t_program *program);
 int                     start_monitoring(t_program *program);
-
+void                    stop_simulation(t_program *program);
+void					my_sleep(long time, t_program *program);
+bool					is_running(t_program *program);

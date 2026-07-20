@@ -49,8 +49,8 @@ static int	can_take(t_dongle *dongle, t_coder *coder)
 
 	if (!dongle || !coder)
 		return (-1);
-	if (!dongle->available)
-		return (0);
+	if (!is_running(coder->program))
+		return (1);
 	now = get_time_ms();
 	if (now - dongle->release_time < coder->program->data.dongle_cooldown)
 		return (0);
@@ -112,6 +112,10 @@ int	acquire_dongles(t_coder *coder)
 	state = acquire_one(second, coder);
 	if (state)
 		return (1);
+    if (!coder->program->running)
+    {
+        return (0);
+    }
 	log_state(heap_pop(&first->heap), "has taken a dongle\n");
 	log_state(heap_pop(&second->heap), "has taken a dongle\n");
 	return (0);
