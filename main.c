@@ -48,12 +48,16 @@ int	main(int ac, char *av[])
     state = join_coders(&program);
 	if (state)
 	{
-		clean_up(&program);
+        clean_up(&program);
 		return (1);
 	}
     state = pthread_join(program.monitor, NULL);
     if (state)
+    {
         clean_up(&program);
+        destroy_mtx_cond(&program);
+        return (1);
+    }
     destroy_mtx_cond(&program);
     clean_up(&program);
     printf("########### program is finish ##############\n");

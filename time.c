@@ -16,7 +16,7 @@ long    get_elapsed_ms(long start)
 }
 
 
-void my_sleep(long time, t_program *program)
+void    my_sleep(long time, t_program *program)
 {
     long    start;
 

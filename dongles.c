@@ -86,7 +86,10 @@ static int	acquire_one(t_dongle *dongle, t_coder *coder)
 		+ coder->program->data.time_to_burnout;
 	state = heap_push(&dongle->heap, coder);
 	if (state)
+	{
+		pthread_mutex_unlock(&dongle->lock);
 		return (1);
+	}
 	while (!can_take(dongle, coder))
 	{
 		wake_up = dongle->release_time + coder->program->data.dongle_cooldown
@@ -112,10 +115,8 @@ int	acquire_dongles(t_coder *coder)
 	state = acquire_one(second, coder);
 	if (state)
 		return (1);
-    if (!coder->program->running)
-    {
+    if (!is_running(coder->program))
         return (0);
-    }
 	log_state(heap_pop(&first->heap), "has taken a dongle\n");
 	log_state(heap_pop(&second->heap), "has taken a dongle\n");
 	return (0);
@@ -127,12 +128,10 @@ void	release_dongles(t_coder *coder)
 		return ;
 	coder->left->release_time = get_time_ms();
 	coder->right->release_time = get_time_ms();
-	coder->left->release_time = get_time_ms();
-	coder->right->release_time = get_time_ms();
-	pthread_mutex_unlock(&coder->left->lock);
-	pthread_mutex_unlock(&coder->right->lock);
 	pthread_cond_broadcast(&coder->left->cond);
 	pthread_cond_broadcast(&coder->right->cond);
+	pthread_mutex_unlock(&coder->left->lock);
+	pthread_mutex_unlock(&coder->right->lock);
 }
 
 void	assign_dongles(t_coder *coder, t_program *program, int counter)

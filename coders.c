@@ -6,7 +6,7 @@
 /*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/27 01:36:10 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/17 14:51:02 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/21 19:09:52 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,22 @@ bool is_running(t_program *program)
 {
     bool    status;
 
+	//printf("time = %id \n", get_elapsed_ms(program->start_time));
     pthread_mutex_lock(&program->monitor_lock);
     status = program->running;
     pthread_mutex_unlock(&program->monitor_lock);
     return (status);
+}
+
+void	run_even_only(t_coder *coder)
+{
+    long    time_to_sleep;
+
+	if (coder->id % 2 != 0)
+	{
+        time_to_sleep = coder->program->data.time_to_compile + coder->program->data.dongle_cooldown;
+		my_sleep(time_to_sleep/2, coder->program);
+	}
 }
 
 void	*coder_routine(void *arg)
@@ -60,12 +72,17 @@ void	*coder_routine(void *arg)
 	t_coder *coder;
 	int		state;
 
- 	coder = (t_coder*)arg;
+	coder = (t_coder*)arg;
     while (!all_thread_ready(coder->program))
-        usleep(100);
-
+	{
+		my_sleep(10, coder->program);
+	}
+	//printf("time = %ld, A %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
+	run_even_only(coder);
 	while (is_running(coder->program))
 	{
+		//printf("time = %ld, C %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
+        printf("coder %d entered main loop\n", coder->id);
         if (is_running(coder->program))
         {
 		    state = acquire_dongles(coder);
@@ -141,7 +158,6 @@ int	join_coders(t_program *program)
 			fprintf(stderr, "Thread %d join failed with code %d\n", y, status);
 			return (1);
 		}
-        // printf("inside join_coders\n");
 		y++;
 	}
 	return (0);
