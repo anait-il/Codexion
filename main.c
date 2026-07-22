@@ -60,6 +60,6 @@ int	main(int ac, char *av[])
     }
     destroy_mtx_cond(&program);
     clean_up(&program);
-    printf("########### program is finish ##############\n");
+    // printf("########### program is finish ##############\n");
     return (0);
 }

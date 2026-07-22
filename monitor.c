@@ -71,11 +71,13 @@ static void    *monitor_routine(void *arg)
         state = detect_burnout(program);
         if (state)
         {
+            pthread_mutex_lock(&program->monitor_lock);
             log_burnout(program, state);
             break;
         }
         if (!detect_end_compile(program))
         {
+            pthread_mutex_lock(&program->monitor_lock);
             break;
         }
         usleep(1000);
@@ -104,7 +106,6 @@ void    stop_simulation(t_program *program)
     i = 0;
     if (!program)
         return;
-    pthread_mutex_lock(&program->monitor_lock);
     program->running = false;
     pthread_mutex_unlock(&program->monitor_lock);
     while (i < program->data.number_of_coders)

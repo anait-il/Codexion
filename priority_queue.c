@@ -62,8 +62,8 @@ int	heap_push(t_heap *heap, t_coder *coder)
 		return (1);
 	if (heap->size >= heap->capacity)
 	{
-		fprintf(stderr, "Heap overflow");
-		return (1);
+		fprintf(stderr, "Heap overflow\n");
+		exit(1);
 	}
 	heap->arr[heap->size] = coder;
 	heap->size++;

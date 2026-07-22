@@ -37,6 +37,7 @@ typedef struct s_coder
 	struct s_dongle		*right;
 	long				arrival_time;
 	long				deadline;
+	pthread_cond_t		cond;
 }						t_coder;
 
 typedef struct s_dongle

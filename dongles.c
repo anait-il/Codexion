@@ -73,7 +73,7 @@ static t_dongle	*assign_second(t_coder *coder)
 	return (coder->left);
 }
 
-static int	acquire_one(t_dongle *dongle, t_coder *coder)
+static int	acquire_first(t_dongle *dongle, t_coder *coder)
 {
 	int				state;
 	t_coder			*status;
@@ -81,15 +81,6 @@ static int	acquire_one(t_dongle *dongle, t_coder *coder)
 	struct timespec	ts;
 
 	pthread_mutex_lock(&dongle->lock);
-	coder->arrival_time = get_time_ms();
-	coder->deadline = coder->last_compile_time
-		+ coder->program->data.time_to_burnout;
-	state = heap_push(&dongle->heap, coder);
-	if (state)
-	{
-		pthread_mutex_unlock(&dongle->lock);
-		return (1);
-	}
 	while (!can_take(dongle, coder))
 	{
 		wake_up = dongle->release_time + coder->program->data.dongle_cooldown
@@ -101,20 +92,64 @@ static int	acquire_one(t_dongle *dongle, t_coder *coder)
 	return (0);
 }
 
+static int	acquire_second(t_dongle *first, t_dongle *dongle, t_coder *coder)
+{
+	int				state;
+	t_coder			*status;
+	long			wake_up;
+
+	pthread_mutex_lock(&dongle->lock);
+	if (!can_take(dongle, coder))
+	{
+        pthread_mutex_unlock(&first->lock);
+		pthread_mutex_unlock(&dongle->lock);
+		return (1);
+	}
+	return (0);
+}
+
 int	acquire_dongles(t_coder *coder)
 {
-	int			state;
-	t_dongle	*first;
-	t_dongle	*second;
+	int				state;
+	t_dongle		*first;
+	t_dongle		*second;
+	struct timespec	ts;
+	long			wake_up;
 
 	first = assign_first(coder);
 	second = assign_second(coder);
-	state = acquire_one(first, coder);
+    pthread_mutex_lock(&coder->program->monitor_lock);
+	coder->arrival_time = get_time_ms();
+	coder->deadline = coder->last_compile_time
+		+ coder->program->data.time_to_burnout;
+    pthread_mutex_unlock(&coder->program->monitor_lock);
+    pthread_mutex_lock(&first->lock);
+	state = heap_push(&first->heap, coder);
+    pthread_mutex_unlock(&first->lock);
 	if (state)
+	{
 		return (1);
-	state = acquire_one(second, coder);
+	}
+    pthread_mutex_lock(&second->lock);
+	state = heap_push(&second->heap, coder);
+    pthread_mutex_unlock(&second->lock);
 	if (state)
+	{
 		return (1);
+	}
+	while (is_running(coder->program))
+	{
+		if (!acquire_first(first, coder))
+		{
+			if (!acquire_second(first, second, coder))
+				break;
+            usleep(500);
+			//wake_up = get_time_ms() - (second->relkease_time + coder->program->data.dongle_cooldown
+			//	+ 1);
+        	//ts.tv_sec = wake_up / 1000;
+        	//ts.tv_nsec = (wake_up % 1000) * 1000000L;
+		}
+	}
     if (!is_running(coder->program))
         return (0);
 	log_state(heap_pop(&first->heap), "has taken a dongle\n");

@@ -6,7 +6,7 @@
 /*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/27 01:36:10 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/21 19:09:52 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/17 14:51:02 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ bool is_running(t_program *program)
 {
     bool    status;
 
-	//printf("time = %id \n", get_elapsed_ms(program->start_time));
     pthread_mutex_lock(&program->monitor_lock);
     status = program->running;
     pthread_mutex_unlock(&program->monitor_lock);
@@ -57,12 +56,9 @@ bool is_running(t_program *program)
 
 void	run_even_only(t_coder *coder)
 {
-    long    time_to_sleep;
-
 	if (coder->id % 2 != 0)
 	{
-        time_to_sleep = coder->program->data.time_to_compile + coder->program->data.dongle_cooldown;
-		my_sleep(time_to_sleep/2, coder->program);
+		my_sleep(coder->program->data.time_to_compile, coder->program);
 	}
 }
 
@@ -75,20 +71,19 @@ void	*coder_routine(void *arg)
 	coder = (t_coder*)arg;
     while (!all_thread_ready(coder->program))
 	{
-		my_sleep(10, coder->program);
+		pthread_cond_wait(&coder->cond);
 	}
-	//printf("time = %ld, A %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
+	if (!is_running(coder->program))
+		return (NULL);
+	// printf("time = %ld, A %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
 	run_even_only(coder);
+	// printf("time = %ld, B %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
 	while (is_running(coder->program))
 	{
-		//printf("time = %ld, C %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
-        printf("coder %d entered main loop\n", coder->id);
-        if (is_running(coder->program))
-        {
-		    state = acquire_dongles(coder);
-            if (state)
-                return (NULL);
-        }
+		// printf("time = %ld, C %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
+		state = acquire_dongles(coder);
+		if (state)
+			return (NULL);
         if (!is_running(coder->program))
         {
             release_dongles(coder);
