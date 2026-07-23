@@ -44,7 +44,7 @@ int all_thread_ready(t_program *program)
 	return (is_running(program));
 }
 
-bool is_running(t_program *program)
+bool    is_running(t_program *program)
 {
     bool    status;
 
@@ -69,18 +69,20 @@ void	*coder_routine(void *arg)
 	int		state;
 
 	coder = (t_coder*)arg;
-    while (!all_thread_ready(coder->program))
-	{
-		pthread_cond_wait(&coder->cond);
-	}
+    pthread_mutex_lock(&coder->program->monitor_lock);
+    while (true)
+    {
+        printf("coder %d, time %ld\n", coder->id, get_elapsed_ms(coder->program->start_time));
+        pthread_cond_wait(&coder->program->barrier_cond, &coder->program->monitor_lock);
+		if (coder->program->running)
+			break;
+    }
+    pthread_mutex_unlock(&coder->program->monitor_lock);
 	if (!is_running(coder->program))
 		return (NULL);
-	// printf("time = %ld, A %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
 	run_even_only(coder);
-	// printf("time = %ld, B %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
-	while (is_running(coder->program))
+    while (is_running(coder->program))
 	{
-		// printf("time = %ld, C %d \n",get_elapsed_ms(coder->program->start_time), coder->id);
 		state = acquire_dongles(coder);
 		if (state)
 			return (NULL);
@@ -132,10 +134,7 @@ int	setup_coders(t_program *program)
     }
     status = start_monitoring(program);
 	if (status)
-	{
-		fprintf(stderr, "Error: monitor creation failed with code %d\n", status);
 		return (1);
-	}
 	return (0);
 }
 

@@ -58,14 +58,13 @@ static void    *monitor_routine(void *arg)
     t_program   *program;
     int         i;
     int         state;
-    long        now;
 
-    now = get_time_ms();
-    program = (t_program*)arg;
     i = 0;
+    program = (t_program*)arg;
     pthread_mutex_lock(&program->monitor_lock);
     program->running = true;
     pthread_mutex_unlock(&program->monitor_lock);
+    pthread_cond_broadcast(&program->barrier_cond);
     while (true)
     {
         state = detect_burnout(program);
@@ -80,7 +79,7 @@ static void    *monitor_routine(void *arg)
             pthread_mutex_lock(&program->monitor_lock);
             break;
         }
-        usleep(1000);
+        usleep(500);
     }
     stop_simulation(program);
     return (NULL);
@@ -93,6 +92,7 @@ int start_monitoring(t_program *program)
     status = pthread_create(&program->monitor, NULL, monitor_routine, program);
     if (status)
     {
+        fprintf(stderr, "Error: monitor create failed with code %d\n", status);
         free_dongles(program);
         return (status);
     }
