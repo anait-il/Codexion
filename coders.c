@@ -56,10 +56,15 @@ bool    is_running(t_program *program)
 
 void	run_even_only(t_coder *coder)
 {
+	long sleep_time;
+
+	sleep_time = (coder->program->data.time_to_compile + coder->program->data.dongle_cooldown) / 2;
+	printf("coder %d in run even only\n", coder->id);
 	if (coder->id % 2 != 0)
 	{
-		my_sleep(coder->program->data.time_to_compile, coder->program);
+		my_sleep(sleep_time, coder->program);
 	}
+	printf("coder %d leave run even only\n", coder->id);
 }
 
 void	*coder_routine(void *arg)
@@ -72,7 +77,7 @@ void	*coder_routine(void *arg)
     pthread_mutex_lock(&coder->program->monitor_lock);
     while (true)
     {
-        printf("coder %d, time %ld\n", coder->id, get_elapsed_ms(coder->program->start_time));
+		printf("coder %d wait for simulation start\n", coder->id);
         pthread_cond_wait(&coder->program->barrier_cond, &coder->program->monitor_lock);
 		if (coder->program->running)
 			break;
@@ -83,24 +88,26 @@ void	*coder_routine(void *arg)
 	run_even_only(coder);
     while (is_running(coder->program))
 	{
+		printf("coder %d is enter\n", coder->id);
 		state = acquire_dongles(coder);
 		if (state)
 			return (NULL);
-        if (!is_running(coder->program))
-        {
-            release_dongles(coder);
-            break;
-        }
-		if (is_running(coder->program))
-        {
-			compile(coder);
-		    release_dongles(coder);
-        }
-		if (is_running(coder->program))
+			if (!is_running(coder->program))
+			{
+				release_dongles(coder);
+				break;
+			}
+			if (is_running(coder->program))
+			{
+				compile(coder);
+				release_dongles(coder);
+			}
+			if (is_running(coder->program))
 			debug(coder);
-		if (is_running(coder->program))
+			if (is_running(coder->program))
 			refactore(coder);
 	}
+	printf("===> detect burnout %d\n", coder->id);
     return (NULL);
 }
 
@@ -115,6 +122,7 @@ int	setup_coders(t_program *program)
 	if (!program->coders)
 	    return (1);
 	program->start_time = get_time_ms();
+	pthread_cond_init(&program->barrier_cond, NULL);
 	while (i < program->data.number_of_coders)
 	{
 		program->coders[i].id = i + 1;

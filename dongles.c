@@ -134,9 +134,7 @@ int	acquire_dongles(t_coder *coder)
 	state = heap_push(&second->heap, coder);
     pthread_mutex_unlock(&second->lock);
 	if (state)
-	{
 		return (1);
-	}
 	while (is_running(coder->program))
 	{
 		if (!acquire_first(first, coder))
@@ -144,10 +142,6 @@ int	acquire_dongles(t_coder *coder)
 			if (!acquire_second(first, second, coder))
 				break;
             usleep(500);
-			//wake_up = get_time_ms() - (second->relkease_time + coder->program->data.dongle_cooldown
-			//	+ 1);
-        	//ts.tv_sec = wake_up / 1000;
-        	//ts.tv_nsec = (wake_up % 1000) * 1000000L;
 		}
 	}
     if (!is_running(coder->program))

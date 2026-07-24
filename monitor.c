@@ -16,7 +16,7 @@
 static int detect_end_compile(t_program *program)
 {
     int i;
-
+    
     i = 0;
     pthread_mutex_lock(&program->monitor_lock);
     while (i < program->data.number_of_coders)
@@ -28,7 +28,6 @@ static int detect_end_compile(t_program *program)
         }
         i++;
     }
-    pthread_mutex_unlock(&program->monitor_lock);
     return (0);
 }
 
@@ -44,7 +43,6 @@ static int    detect_burnout(t_program *program)
     {
         if ((now - program->coders[i].last_compile_time) > program->data.time_to_burnout)
         {
-            pthread_mutex_unlock(&program->monitor_lock);
             return (i + 1);
         }
         i++;
@@ -58,7 +56,7 @@ static void    *monitor_routine(void *arg)
     t_program   *program;
     int         i;
     int         state;
-
+    
     i = 0;
     program = (t_program*)arg;
     pthread_mutex_lock(&program->monitor_lock);
@@ -70,13 +68,11 @@ static void    *monitor_routine(void *arg)
         state = detect_burnout(program);
         if (state)
         {
-            pthread_mutex_lock(&program->monitor_lock);
             log_burnout(program, state);
             break;
         }
         if (!detect_end_compile(program))
         {
-            pthread_mutex_lock(&program->monitor_lock);
             break;
         }
         usleep(500);
@@ -104,8 +100,6 @@ void    stop_simulation(t_program *program)
     int i;
 
     i = 0;
-    if (!program)
-        return;
     program->running = false;
     pthread_mutex_unlock(&program->monitor_lock);
     while (i < program->data.number_of_coders)
@@ -113,4 +107,5 @@ void    stop_simulation(t_program *program)
         pthread_cond_broadcast(&program->dongles[i].cond);
         i++;
     }
+    pthread_cond_broadcast(&program->barrier_cond);
 }
