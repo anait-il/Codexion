@@ -23,7 +23,7 @@ void    my_sleep(long time, t_program *program)
     start = get_time_ms();
     while (get_time_ms() - start < time)
     {
-        usleep((time/10) * 1000);
+        usleep((time/20) * 1000);
         if (!is_running(program))
             return;
     }

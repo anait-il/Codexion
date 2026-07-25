@@ -73,39 +73,57 @@ static t_dongle	*assign_second(t_coder *coder)
 	return (coder->left);
 }
 
-static int	acquire_first(t_dongle *dongle, t_coder *coder)
+static int	acquire_first(t_dongle *first, t_coder *coder)
 {
 	int				state;
 	t_coder			*status;
 	long			wake_up;
 	struct timespec	ts;
 
-	pthread_mutex_lock(&dongle->lock);
-	while (!can_take(dongle, coder))
+	pthread_mutex_lock(&first->lock);
+	while (!can_take(first, coder))
 	{
-		wake_up = dongle->release_time + coder->program->data.dongle_cooldown
-			+ 1;
+		wake_up = first->release_time + coder->program->data.dongle_cooldown;
         ts.tv_sec = wake_up / 1000;
         ts.tv_nsec = (wake_up % 1000) * 1000000L;
-        pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
+        pthread_cond_timedwait(&first->cond, &first->lock, &ts);
 	}
 	return (0);
 }
 
-static int	acquire_second(t_dongle *first, t_dongle *dongle, t_coder *coder)
+static int	acquire_second(t_dongle *first, t_dongle *second, t_coder *coder)
 {
 	int				state;
 	t_coder			*status;
 	long			wake_up;
 
-	pthread_mutex_lock(&dongle->lock);
-	if (!can_take(dongle, coder))
+	pthread_mutex_lock(&second->lock);
+	if (!can_take(second, coder))
 	{
+		pthread_mutex_unlock(&second->lock);
         pthread_mutex_unlock(&first->lock);
-		pthread_mutex_unlock(&dongle->lock);
 		return (1);
 	}
 	return (0);
+}
+
+static void	setup_schedular_times(t_coder *coder)
+{
+	pthread_mutex_lock(&coder->program->monitor_lock);
+	coder->arrival_time = get_time_ms();
+	coder->deadline = coder->last_compile_time
+		+ coder->program->data.time_to_burnout;
+    pthread_mutex_unlock(&coder->program->monitor_lock);
+}
+
+static int	push(t_dongle *dongle, t_coder *coder)
+{
+	int	state;
+
+	pthread_mutex_lock(&dongle->lock);
+	state = heap_push(&dongle->heap, coder);
+    pthread_mutex_unlock(&dongle->lock);
+	return (state);
 }
 
 int	acquire_dongles(t_coder *coder)
@@ -113,36 +131,22 @@ int	acquire_dongles(t_coder *coder)
 	int				state;
 	t_dongle		*first;
 	t_dongle		*second;
-	struct timespec	ts;
-	long			wake_up;
 
 	first = assign_first(coder);
 	second = assign_second(coder);
-    pthread_mutex_lock(&coder->program->monitor_lock);
-	coder->arrival_time = get_time_ms();
-	coder->deadline = coder->last_compile_time
-		+ coder->program->data.time_to_burnout;
-    pthread_mutex_unlock(&coder->program->monitor_lock);
-    pthread_mutex_lock(&first->lock);
-	state = heap_push(&first->heap, coder);
-    pthread_mutex_unlock(&first->lock);
+    setup_schedular_times(coder);
+    state = push(first, coder);
 	if (state)
-	{
 		return (1);
-	}
-    pthread_mutex_lock(&second->lock);
-	state = heap_push(&second->heap, coder);
-    pthread_mutex_unlock(&second->lock);
+    state = push(second, coder);
 	if (state)
 		return (1);
 	while (is_running(coder->program))
 	{
-		if (!acquire_first(first, coder))
-		{
-			if (!acquire_second(first, second, coder))
-				break;
-            usleep(500);
-		}
+		acquire_first(first, coder);
+		if (!acquire_second(first, second, coder))
+			break;
+        usleep(500);
 	}
     if (!is_running(coder->program))
         return (0);

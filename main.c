@@ -30,6 +30,8 @@ int	main(int ac, char *av[])
 {
 	int			state;
 	t_program	program;
+    extern int odd;
+    extern int even;
 
     program.running = false;
 	state = parsing(ac, av, &program);
@@ -42,7 +44,7 @@ int	main(int ac, char *av[])
 	state = setup_coders(&program);
 	if (state)
 	{
-		clean_threads(&program, state);
+        clean_threads(&program, state);
 		return (8);
 	}
     state = join_coders(&program);
@@ -51,6 +53,7 @@ int	main(int ac, char *av[])
         clean_up(&program);
 		return (1);
 	}
+    printf("=========odd coderes = %d, even coders = %d================\n", odd, even);
     state = pthread_join(program.monitor, NULL);
     if (state)
     {
@@ -60,6 +63,5 @@ int	main(int ac, char *av[])
     }
     destroy_mtx_cond(&program);
     clean_up(&program);
-    // printf("########### program is finish ##############\n");
     return (0);
 }

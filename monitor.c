@@ -56,15 +56,17 @@ static void    *monitor_routine(void *arg)
     t_program   *program;
     int         i;
     int         state;
-    
+
     i = 0;
     program = (t_program*)arg;
     pthread_mutex_lock(&program->monitor_lock);
     program->running = true;
+    program->start_time = get_time_ms();
     pthread_mutex_unlock(&program->monitor_lock);
     pthread_cond_broadcast(&program->barrier_cond);
     while (true)
     {
+        usleep(500);
         state = detect_burnout(program);
         if (state)
         {
@@ -72,10 +74,7 @@ static void    *monitor_routine(void *arg)
             break;
         }
         if (!detect_end_compile(program))
-        {
             break;
-        }
-        usleep(500);
     }
     stop_simulation(program);
     return (NULL);
