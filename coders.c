@@ -61,9 +61,12 @@ static void	run_even_only(t_coder *coder)
 static void	wait_for_start(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->program->monitor_lock);
-    while (!coder->program->running)
+    while (!coder->program->started)
         pthread_cond_wait(&coder->program->barrier_cond, &coder->program->monitor_lock);
 	coder->last_compile_time = coder->program->start_time;
+	coder->program->ready_count++;
+	if (coder->program->ready_count == coder->program->data.number_of_coders)
+		pthread_cond_signal(&coder->program->ready_cond);
     pthread_mutex_unlock(&coder->program->monitor_lock);
 }
 
@@ -89,19 +92,14 @@ void	*coder_routine(void *arg)
 
 	coder = (t_coder*)arg;
     wait_for_start(coder);
-	// printf("counter is %d\n", ++counter);
 	if (!is_running(coder->program))
 		return (NULL);
 	run_even_only(coder);
-	if (coder->id % 2 == 0)
-		even++;
-	else
-		odd++;
     while (is_running(coder->program))
 	{
 		state = acquire_dongles(coder);
 		if (state)
-		return (NULL);
+			return (NULL);
 		if (!is_running(coder->program))
 		{
 			release_dongles(coder);
@@ -109,9 +107,22 @@ void	*coder_routine(void *arg)
 		}
 		coder_cycle(coder);
 	}
-	// if (coder->id % 2 != 0)
-		// printf("---->first odd wakes up at time %ld: %d\n", get_elapsed_ms(coder->program->start_time), coder->id);
     return (NULL);
+}
+
+static void	init_coder_param(t_coder *coder, t_program *program, int i)
+{
+	coder->id = i + 1;
+	assign_dongles(coder, program, i+1);
+	coder->program = program;
+	coder->last_compile_time = 0;
+	coder->compile_counter = 0;
+}
+
+static void	program_cond_init(t_program *program)
+{
+	pthread_cond_init(&program->barrier_cond, NULL);
+	pthread_cond_init(&program->ready_cond, NULL);
 }
 
 int	setup_coders(t_program *program)
@@ -124,14 +135,10 @@ int	setup_coders(t_program *program)
     program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
 	if (!program->coders)
 	    return (1);
-	pthread_cond_init(&program->barrier_cond, NULL);
+	program_cond_init(program);
 	while (i < program->data.number_of_coders)
 	{
-		program->coders[i].id = i + 1;
-        assign_dongles(&program->coders[i], program, i+1);
-		program->coders[i].program = program;
-		program->coders[i].last_compile_time = 0;
-		program->coders[i].compile_counter = 0;
+		init_coder_param(&program->coders[i], program, i);
 		status = pthread_create(&t[i], NULL, coder_routine, &program->coders[i]);
 		if (status)
 		{
@@ -142,8 +149,7 @@ int	setup_coders(t_program *program)
 		program->coders[i].thread = t[i];
 		i++;
     }
-    status = start_monitoring(program);
-	if (status)
+	if (start_monitoring(program))
 		return (1);
 	return (0);
 }

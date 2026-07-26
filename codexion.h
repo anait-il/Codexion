@@ -54,6 +54,8 @@ typedef struct s_dongle
 typedef struct s_program
 {
 	bool				running;
+	bool				started;
+	int					ready_count;
 	pthread_t			monitor;
 	long				start_time;
 	t_args				data;
@@ -61,7 +63,7 @@ typedef struct s_program
 	t_dongle			*dongles;
 	pthread_mutex_t		monitor_lock;
     pthread_cond_t      barrier_cond;
-    pthread_mutex_t     barrier_lock;
+	pthread_cond_t		ready_cond;
 	pthread_mutex_t		print_lock;
 }						t_program;
 

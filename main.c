@@ -13,10 +13,12 @@
 #include "codexion.h"
 #include <pthread.h>
 
-int init_mutex(t_program *program)
+static int init_program(t_program *program)
 {
     int status;
 
+    program->running = false;
+    program->started = false;
     status = pthread_mutex_init(&program->monitor_lock, NULL);
     if (status)
         return (1);
@@ -30,14 +32,11 @@ int	main(int ac, char *av[])
 {
 	int			state;
 	t_program	program;
-    extern int odd;
-    extern int even;
 
-    program.running = false;
 	state = parsing(ac, av, &program);
 	if (state == 1)
 		return (1);
-    state = init_mutex(&program);
+    state = init_program(&program);
     state = setup_dongles(&program);
     if (state)
         return (7);
@@ -53,7 +52,6 @@ int	main(int ac, char *av[])
         clean_up(&program);
 		return (1);
 	}
-    printf("=========odd coderes = %d, even coders = %d================\n", odd, even);
     state = pthread_join(program.monitor, NULL);
     if (state)
     {

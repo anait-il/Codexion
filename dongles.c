@@ -46,11 +46,11 @@ int	setup_dongles(t_program *program)
 static int	can_take(t_dongle *dongle, t_coder *coder)
 {
 	long	now;
-
-	if (!dongle || !coder)
-		return (-1);
+	
 	if (!is_running(coder->program))
 		return (1);
+	if (!dongle->available)
+		return (0);
 	now = get_time_ms();
 	if (now - dongle->release_time < coder->program->data.dongle_cooldown)
 		return (0);
@@ -104,6 +104,10 @@ static int	acquire_second(t_dongle *first, t_dongle *second, t_coder *coder)
         pthread_mutex_unlock(&first->lock);
 		return (1);
 	}
+	first->available = false;
+	second->available = false;
+	pthread_mutex_unlock(&second->lock);
+    pthread_mutex_unlock(&first->lock);
 	return (0);
 }
 
@@ -146,10 +150,10 @@ int	acquire_dongles(t_coder *coder)
 		acquire_first(first, coder);
 		if (!acquire_second(first, second, coder))
 			break;
-        usleep(500);
+        my_sleep(1, coder->program);
 	}
     if (!is_running(coder->program))
-        return (0);
+        return (1);
 	log_state(heap_pop(&first->heap), "has taken a dongle\n");
 	log_state(heap_pop(&second->heap), "has taken a dongle\n");
 	return (0);
@@ -158,13 +162,17 @@ int	acquire_dongles(t_coder *coder)
 void	release_dongles(t_coder *coder)
 {
 	if (!coder)
-		return ;
+		return;
+	pthread_mutex_lock(&coder->left->lock);
 	coder->left->release_time = get_time_ms();
+	coder->left->available = true;
+	pthread_mutex_unlock(&coder->left->lock);
+	pthread_mutex_lock(&coder->right->lock);
 	coder->right->release_time = get_time_ms();
+	coder->right->available = true;
+	pthread_mutex_unlock(&coder->right->lock);
 	pthread_cond_broadcast(&coder->left->cond);
 	pthread_cond_broadcast(&coder->right->cond);
-	pthread_mutex_unlock(&coder->left->lock);
-	pthread_mutex_unlock(&coder->right->lock);
 }
 
 void	assign_dongles(t_coder *coder, t_program *program, int counter)

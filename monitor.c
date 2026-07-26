@@ -41,7 +41,7 @@ static int    detect_burnout(t_program *program)
     now  = get_time_ms();
     while (i < program->data.number_of_coders)
     {
-        if ((now - program->coders[i].last_compile_time) > program->data.time_to_burnout)
+        if ((now - program->coders[i].last_compile_time) >= program->data.time_to_burnout)
         {
             return (i + 1);
         }
@@ -61,12 +61,15 @@ static void    *monitor_routine(void *arg)
     program = (t_program*)arg;
     pthread_mutex_lock(&program->monitor_lock);
     program->running = true;
+    program->started = true;
     program->start_time = get_time_ms();
-    pthread_mutex_unlock(&program->monitor_lock);
     pthread_cond_broadcast(&program->barrier_cond);
+    while (program->ready_count < program->data.number_of_coders)
+        pthread_cond_wait(&program->ready_cond, &program->monitor_lock);
+    pthread_mutex_unlock(&program->monitor_lock);
     while (true)
     {
-        usleep(500);
+        usleep(100);
         state = detect_burnout(program);
         if (state)
         {
