@@ -4,7 +4,7 @@ CC = cc
 
 FILE = main.c atoi_function.c parsing.c clean.c coders.c dongles.c priority_queue.c logs.c time.c monitor.c
 
-FLAGS = -g3
+FLAGS = -pthread
 
 OBJ = $(FILE:%.c=%.o)
 
@@ -24,3 +24,4 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+

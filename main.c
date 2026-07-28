@@ -6,7 +6,7 @@
 /*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/30 15:54:59 by anait-il          #+#    #+#             */
-/*   Updated: 2026/06/30 15:54:59 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/28 16:44:25 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,26 +34,24 @@ int	main(int ac, char *av[])
 	t_program	program;
 
 	state = parsing(ac, av, &program);
-	if (state == 1)
-		return (1);
-    state = init_program(&program);
-    state = setup_dongles(&program);
-    if (state)
-        return (7);
-	state = setup_coders(&program);
 	if (state)
-	{
+		return (1);
+    if (init_program(&program))
+        return (1);
+    if (setup_dongles(&program))
+        return (1);
+    state = setup_coders(&program);
+    if (state)
+    {
         clean_threads(&program, state);
-		return (8);
-	}
-    state = join_coders(&program);
-	if (state)
-	{
+        return (8);
+    }
+    if (join_coders(&program))
+    {
         clean_up(&program);
-		return (1);
-	}
-    state = pthread_join(program.monitor, NULL);
-    if (state)
+        return (1);
+    }
+    if (pthread_join(program.monitor, NULL))
     {
         clean_up(&program);
         destroy_mtx_cond(&program);

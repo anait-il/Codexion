@@ -6,16 +6,12 @@
 /*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/27 01:36:10 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/17 14:51:02 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/28 16:35:42 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int odd = 0;
-int even = 0;
-
-pthread_mutex_t mutex;
 
 void    compile(t_coder *coder)
 {
@@ -81,39 +77,42 @@ static void	coder_cycle(t_coder *coder)
 		debug(coder);
 	if (is_running(coder->program))
 		refactore(coder);
+	setup_schedular_times(coder);
 }
 
 void	*coder_routine(void *arg)
 {
-	bool	running;
-	t_coder *coder;
-	int		state;
-	static int counter=0;
+	bool		running;
+	t_coder		*coder;
+	int			state;
+	static int	counter = 0;
 
-	coder = (t_coder*)arg;
-    wait_for_start(coder);
+	coder = (t_coder *)arg;
+	wait_for_start(coder);
 	if (!is_running(coder->program))
 		return (NULL);
 	run_even_only(coder);
-    while (is_running(coder->program))
+	while (is_running(coder->program))
 	{
+		if (coder->program->data.number_of_compiles_required == coder->compile_counter)
+			break ;
 		state = acquire_dongles(coder);
 		if (state)
 			return (NULL);
 		if (!is_running(coder->program))
 		{
 			release_dongles(coder);
-			break;
+			break ;
 		}
 		coder_cycle(coder);
 	}
-    return (NULL);
+	return (NULL);
 }
 
 static void	init_coder_param(t_coder *coder, t_program *program, int i)
 {
 	coder->id = i + 1;
-	assign_dongles(coder, program, i+1);
+	assign_dongles(coder, program, i + 1);
 	coder->program = program;
 	coder->last_compile_time = 0;
 	coder->compile_counter = 0;
@@ -132,14 +131,15 @@ int	setup_coders(t_program *program)
 	pthread_t	t[program->data.number_of_coders];
 
 	i = 0;
-    program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
+	program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
 	if (!program->coders)
-	    return (1);
+		return (1);
 	program_cond_init(program);
 	while (i < program->data.number_of_coders)
 	{
 		init_coder_param(&program->coders[i], program, i);
-		status = pthread_create(&t[i], NULL, coder_routine, &program->coders[i]);
+		status = pthread_create(&t[i], NULL, coder_routine,
+				&program->coders[i]);
 		if (status)
 		{
 			fprintf(stderr, "Thread %d creation failed with code %d\n", i + 1,
@@ -148,7 +148,7 @@ int	setup_coders(t_program *program)
 		}
 		program->coders[i].thread = t[i];
 		i++;
-    }
+	}
 	if (start_monitoring(program))
 		return (1);
 	return (0);
@@ -162,7 +162,7 @@ int	join_coders(t_program *program)
 	y = 0;
 	while (y < program->data.number_of_coders)
 	{
-		status = pthread_join(program->coders[y].thread, NULL);	
+		status = pthread_join(program->coders[y].thread, NULL);
 		if (status)
 		{
 			fprintf(stderr, "Thread %d join failed with code %d\n", y, status);

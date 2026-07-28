@@ -94,3 +94,4 @@ int                     start_monitoring(t_program *program);
 void                    stop_simulation(t_program *program);
 void					my_sleep(long time, t_program *program);
 bool    				is_running(t_program *program);
+void                    setup_schedular_times(t_coder *coder);

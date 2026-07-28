@@ -9,11 +9,29 @@ static void	swap(t_coder **c1, t_coder **c2)
 	*c2 = tmp;
 }
 
-static int	has_priority(t_coder *a, t_coder *b, char *schedular)
+static int tie_breaker(t_coder *a, t_coder *b)
 {
-	if (strcmp(schedular, "edf") == 0)
-		return (a->deadline < b->deadline);
-	return (a->arrival_time < b->arrival_time);
+    if (a->compile_counter != b->compile_counter)
+        return (a->compile_counter < b->compile_counter);
+    else
+        return (a->id < b->id);
+
+}
+
+static int    has_priority(t_coder *a, t_coder *b, char *schedular)
+{
+    if (strcmp(schedular, "edf") == 0)
+    {
+        if (a->deadline - b->deadline != 0)
+            return (a->deadline < b->deadline);
+        return (tie_breaker(a, b));
+    }
+    else
+    {
+        if (a->arrival_time - b->arrival_time != 0)
+            return (a->arrival_time < b->arrival_time);
+        return (tie_breaker(a, b));
+    }
 }
 
 static void	bubble_up(t_heap *heap, char *schedular)
@@ -27,7 +45,9 @@ static void	bubble_up(t_heap *heap, char *schedular)
 	{
 		swap(&heap->arr[i], &heap->arr[parent]);
 		i = parent;
-		parent = (i - 1) / 2; } }
+		parent = (i - 1) / 2;
+	}
+}
 
 static void	bubble_down(t_heap *heap, char *schedular)
 {
@@ -63,7 +83,7 @@ int	heap_push(t_heap *heap, t_coder *coder)
 	if (heap->size >= heap->capacity)
 	{
 		fprintf(stderr, "Heap overflow\n");
-		exit(1);
+		return (1);
 	}
 	heap->arr[heap->size] = coder;
 	heap->size++;

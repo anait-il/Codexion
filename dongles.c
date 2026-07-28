@@ -6,7 +6,7 @@
 /*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/13 12:12:05 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/13 12:42:44 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/28 17:16:45 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ static int	acquire_second(t_dongle *first, t_dongle *second, t_coder *coder)
 	return (0);
 }
 
-static void	setup_schedular_times(t_coder *coder)
+void	setup_schedular_times(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->program->monitor_lock);
 	coder->arrival_time = get_time_ms();
@@ -138,7 +138,12 @@ int	acquire_dongles(t_coder *coder)
 
 	first = assign_first(coder);
 	second = assign_second(coder);
-    setup_schedular_times(coder);
+	if (first == second)
+    {
+        acquire_first(first, coder);
+        log_state(heap_pop(&first->heap), "has taken a dongle\n");
+		return (1);
+    }
     state = push(first, coder);
 	if (state)
 		return (1);
@@ -166,13 +171,13 @@ void	release_dongles(t_coder *coder)
 	pthread_mutex_lock(&coder->left->lock);
 	coder->left->release_time = get_time_ms();
 	coder->left->available = true;
+	pthread_cond_broadcast(&coder->left->cond);
 	pthread_mutex_unlock(&coder->left->lock);
 	pthread_mutex_lock(&coder->right->lock);
 	coder->right->release_time = get_time_ms();
 	coder->right->available = true;
-	pthread_mutex_unlock(&coder->right->lock);
-	pthread_cond_broadcast(&coder->left->cond);
 	pthread_cond_broadcast(&coder->right->cond);
+	pthread_mutex_unlock(&coder->right->lock);
 }
 
 void	assign_dongles(t_coder *coder, t_program *program, int counter)
