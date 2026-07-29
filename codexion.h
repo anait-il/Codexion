@@ -6,6 +6,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#define ft_malloc(x) 0
+
 typedef struct s_args
 {
 	int					number_of_coders;
@@ -95,3 +97,4 @@ void                    stop_simulation(t_program *program);
 void					my_sleep(long time, t_program *program);
 bool    				is_running(t_program *program);
 void                    setup_schedular_times(t_coder *coder);
+int                     parsing_error(char *msg, int ret);

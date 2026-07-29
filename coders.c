@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coders.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/27 01:36:10 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/28 16:35:42 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/29 11:59:30 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ int	setup_coders(t_program *program)
 	pthread_t	t[program->data.number_of_coders];
 
 	i = 0;
-	program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
+	program->coders = ft_malloc(sizeof(t_coder) * program->data.number_of_coders);
 	if (!program->coders)
 		return (1);
 	program_cond_init(program);

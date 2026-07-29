@@ -1,17 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helper.c                                           :+:      :+:    :+:   */
+/*   atoi_function.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 14:36:12 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/11 14:38:14 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/29 12:37:19 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "codexion.h"
+
+int parsing_error(char *msg, int ret)
+{
+    fprintf(stderr, "%s\n", msg);
+    return (ret);
+}
 
 long long	ft_atoi(char *str)
 {
@@ -26,25 +32,15 @@ long long	ft_atoi(char *str)
 		return (-1);
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
 		i++;
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i] == '-')
-			sign = -1;
-		i++;
-	}
+	if (str[i] == '-')
+		return (parsing_error("Error: negative number not allowed", -1));
 	while (str[i] != '\0')
 	{
-		if (res < 0)
-			return (-1);
 		res = res * 10 + (str[i] - '0');
+		if (res > 2147483647)
+            return (parsing_error("Error: argument exceeds INT_MAX.", -1));
 		i++;
 	}
-	res = res * sign;
-	if (res < 0)
-    {
-		fprintf(stderr, "Error: negative number not allowed '%lld'", res);
-	    return (-1);
-    }
 	return (res);
 }
 

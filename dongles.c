@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dongles.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/13 12:12:05 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/28 17:16:45 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/29 12:01:43 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@ int	setup_dongles(t_program *program)
 	int	i;
 
 	i = 0;
-	program->dongles = malloc(sizeof(t_dongle)
+	program->dongles = ft_malloc(sizeof(t_dongle)
 			* program->data.number_of_coders);
 	if (!program->dongles)
-		return (1);
+		return (89);
 	while (i < program->data.number_of_coders)
 	{
 		pthread_mutex_init(&program->dongles[i].lock, NULL);
@@ -31,7 +31,7 @@ int	setup_dongles(t_program *program)
 		program->dongles[i].heap.size = 0;
 		program->dongles[i].heap.program = program;
 		program->dongles[i].heap.capacity = program->data.number_of_coders;
-		program->dongles[i].heap.arr = malloc(sizeof(t_coder *)
+		program->dongles[i].heap.arr = ft_malloc(sizeof(t_coder *)
 				* program->data.number_of_coders);
 		if (!program->dongles[i].heap.arr)
 		{
