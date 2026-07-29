@@ -51,14 +51,8 @@ static int    detect_burnout(t_program *program)
     return (0);
 }
 
-static void    *monitor_routine(void *arg)
+static void run_simulation(t_program *program)
 {
-    t_program   *program;
-    int         i;
-    int         state;
-
-    i = 0;
-    program = (t_program*)arg;
     pthread_mutex_lock(&program->monitor_lock);
     program->running = true;
     program->started = true;
@@ -67,6 +61,17 @@ static void    *monitor_routine(void *arg)
     while (program->ready_count < program->data.number_of_coders)
         pthread_cond_wait(&program->ready_cond, &program->monitor_lock);
     pthread_mutex_unlock(&program->monitor_lock);
+}
+
+static void    *monitor_routine(void *arg)
+{
+    t_program   *program;
+    int         i;
+    int         state;
+
+    i = 0;
+    program = (t_program*)arg;
+    run_simulation(program);
     while (true)
     {
         usleep(100);
@@ -106,8 +111,9 @@ void    stop_simulation(t_program *program)
     pthread_mutex_unlock(&program->monitor_lock);
     while (i < program->data.number_of_coders)
     {
+        pthread_mutex_lock(&program->dongles[i].lock);
         pthread_cond_broadcast(&program->dongles[i].cond);
+        pthread_mutex_unlock(&program->dongles[i].lock);
         i++;
     }
-    pthread_cond_broadcast(&program->barrier_cond);
 }
