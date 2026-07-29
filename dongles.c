@@ -17,10 +17,10 @@ int	setup_dongles(t_program *program)
 	int	i;
 
 	i = 0;
-	program->dongles = ft_malloc(sizeof(t_dongle)
+	program->dongles = malloc(sizeof(t_dongle)
 			* program->data.number_of_coders);
 	if (!program->dongles)
-		return (89);
+		return (1);
 	while (i < program->data.number_of_coders)
 	{
 		pthread_mutex_init(&program->dongles[i].lock, NULL);
@@ -31,11 +31,11 @@ int	setup_dongles(t_program *program)
 		program->dongles[i].heap.size = 0;
 		program->dongles[i].heap.program = program;
 		program->dongles[i].heap.capacity = program->data.number_of_coders;
-		program->dongles[i].heap.arr = ft_malloc(sizeof(t_coder *)
+		program->dongles[i].heap.arr = malloc(sizeof(t_coder *)
 				* program->data.number_of_coders);
 		if (!program->dongles[i].heap.arr)
 		{
-			free(program->dongles);
+			free_dongles(program, i);
 			return (1);
 		}
 		i++;

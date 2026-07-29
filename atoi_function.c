@@ -33,12 +33,15 @@ long long	ft_atoi(char *str)
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
 		i++;
 	if (str[i] == '-')
-		return (parsing_error("Error: negative number not allowed", -1));
+		return (parsing_error("Error: negative numbers not allowed", -1));
 	while (str[i] != '\0')
 	{
 		res = res * 10 + (str[i] - '0');
 		if (res > 2147483647)
-            return (parsing_error("Error: argument exceeds INT_MAX.", -1));
+		{
+            fprintf(stderr, "Error: argument exceeds INT_MAX '%s'\n", str);
+			return (-1);
+		}
 		i++;
 	}
 	return (res);
@@ -47,6 +50,13 @@ long long	ft_atoi(char *str)
 int	ft_isdigit(int i)
 {
 	if (i >= '0' && i <= '9')
+		return (1);
+	return (0);
+}
+
+int	is_space(int i)
+{
+	if (i == ' ' || (i <= 13 && i >= 9))
 		return (1);
 	return (0);
 }

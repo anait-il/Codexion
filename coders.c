@@ -91,7 +91,7 @@ void	*coder_routine(void *arg)
 	wait_for_start(coder);
 	if (!is_running(coder->program))
 		return (NULL);
-	run_even_only(coder);
+	// run_even_only(coder);
 	while (is_running(coder->program))
 	{
 		if (coder->program->data.number_of_compiles_required == coder->compile_counter)
@@ -131,9 +131,9 @@ int	setup_coders(t_program *program)
 	pthread_t	t[program->data.number_of_coders];
 
 	i = 0;
-	program->coders = ft_malloc(sizeof(t_coder) * program->data.number_of_coders);
+	program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
 	if (!program->coders)
-		return (1);
+		return (-1);
 	program_cond_init(program);
 	while (i < program->data.number_of_coders)
 	{

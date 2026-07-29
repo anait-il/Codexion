@@ -40,8 +40,9 @@ int	is_valid(char *av[])
                 return (i);
             y++;
         }
-        return (0);
+        i++;
     }
+    return (0);
 }
 
 static int  parse_arg(char *arg, void *dst, char *type)
@@ -51,30 +52,31 @@ static int  parse_arg(char *arg, void *dst, char *type)
     value = ft_atoi(arg);
     if (value == -1)
         return (1);
-    if (strcmp(type, "int"))
+    if (!strcmp(type, "int"))
         *(int *)dst = value;
-    else if ((type, "long"))
+    else if (!strcmp(type, "long"))
         *(long long*)dst = value;
     return (0);
 }
 
-void   init_args(char *av[], t_program *program)
+static int   init_args(char *av[], t_program *program)
 {
-    if (parse_arg(av[1], &program->data.number_of_coders, "int"));
-        return;
-    if (parse_arg(av[2], &program->data.time_to_burnout, "long"));
-        return;
-    if (parse_arg(av[3], &program->data.time_to_compile, "long"));
-        return;
-    if (parse_arg(av[4], &program->data.time_to_debug, "long"));
-        return;
-    if (parse_arg(av[5], &program->data.time_to_refactor, "long"));
-        return;
-    if (parse_arg(av[6], &program->data.number_of_compiles_required, "int"));
-        return;
-    if (parse_arg(av[7], &program->data.dongle_cooldown, "long"));
-        return;
+    if (parse_arg(av[1], &program->data.number_of_coders, "int"))
+        return (1);
+    if (parse_arg(av[2], &program->data.time_to_burnout, "long"))
+        return (1);
+    if (parse_arg(av[3], &program->data.time_to_compile, "long"))
+        return (1);
+    if (parse_arg(av[4], &program->data.time_to_debug, "long"))
+        return (1);
+    if (parse_arg(av[5], &program->data.time_to_refactor, "long"))
+        return (1);
+    if (parse_arg(av[6], &program->data.number_of_compiles_required, "int"))
+        return (1);
+    if (parse_arg(av[7], &program->data.dongle_cooldown, "long"))
+        return (1);
 	program->data.scheduler = av[8];
+    return (0);
 }
 
 int	parsing(int ac, char *av[], t_program *program)
@@ -83,13 +85,13 @@ int	parsing(int ac, char *av[], t_program *program)
 
 	if (ac != 9)
 	{
-		fprintf(stderr, "Error: number of arguments is not correct ");
+        fprintf(stderr, "Error: number of arguments is not correct ");
 		return (1);
 	}
 	parsing_stat = is_valid(av);
 	if (parsing_stat)
 	{
-		fprintf(stderr, "Error: invalid argument '%s'", av[parsing_stat]);
+        fprintf(stderr, "Error: invalid argument '%s'", av[parsing_stat]);
 		return (1);
 	}
     if (schedular_check(av[8]))
@@ -97,6 +99,7 @@ int	parsing(int ac, char *av[], t_program *program)
         fprintf(stderr, "Error: Schedular must be exactly either 'edf' or 'fifo'\n");
         return (1);
     }
-	init_args(av, program);
+	if (init_args(av, program))
+        return (1);
 	return (0);
 }

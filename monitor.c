@@ -96,7 +96,7 @@ int start_monitoring(t_program *program)
     if (status)
     {
         fprintf(stderr, "Error: monitor create failed with code %d\n", status);
-        free_dongles(program);
+        free_dongles(program, program->data.number_of_coders);
         return (status);
     }
     return (0);

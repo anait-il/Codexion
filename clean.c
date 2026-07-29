@@ -13,12 +13,12 @@
 #include "codexion.h"
 #include <pthread.h>
 
-void free_dongles(t_program *program)
+void free_dongles(t_program *program, int total)
 {
     int i;
 
     i = 0;
-    while (i < program->data.number_of_coders)
+    while (i < total)
     {
         free(program->dongles[i].heap.arr);
         i++;
@@ -46,7 +46,7 @@ int	clean_up(t_program *program)
 	int	i;
 
 	i = 0;
-    free_dongles(program);
+    free_dongles(program, program->data.number_of_coders);
 	free(program->coders);
 	return (0);
 }
@@ -57,6 +57,8 @@ int	clean_threads(t_program *program, int coders_counter)
 	int	status;
 
 	i = 0;
+    if (coders_counter == 0 && coders_counter == -1)
+        return (0);
 	while (i < coders_counter)
 	{
 		status = pthread_join(program->coders[i].thread, NULL);
