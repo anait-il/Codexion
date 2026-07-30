@@ -6,13 +6,13 @@
 /*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 14:37:07 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/29 13:08:51 by abdelkabir       ###   ########.fr       */
+/*   Updated: 2026/07/30 05:54:46 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int schedular_check(char *schedular)
+static int schedular_check(char *schedular)
 {
     if (!strcmp(schedular, "fifo"))
         return (0);
@@ -21,7 +21,7 @@ int schedular_check(char *schedular)
     return (1);
 }
 
-int	is_valid(char *av[])
+static int	is_valid(char *av[])
 {
 	int	i;
 	int	y;

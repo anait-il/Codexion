@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/30 15:54:59 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/28 16:44:25 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/30 05:53:53 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,12 @@ static int init_program(t_program *program)
     return (0);
 }
 
-// int full_clean(t_program *program)
-// {
-//     destroy_mtx_cond(&program);
-//     clean_up(&program);
-// }
+static int full_clean_exit(t_program *program, int status)
+{
+    destroy_mtx_cond(program);
+    clean_up(program);
+    return (status);
+}
 
 int	main(int ac, char *av[])
 {
@@ -58,14 +59,6 @@ int	main(int ac, char *av[])
         return (1);
     }
     if (pthread_join(program.monitor, NULL))
-    {
-        destroy_mtx_cond(&program);
-        clean_up(&program);
-        // full_clean(&program);
-        return (1);
-    }
-    destroy_mtx_cond(&program);
-    clean_up(&program);
-    // full_clean(&program);
-    return (0);
+        return (full_clean_exit(&program, 1));
+    return (full_clean_exit(&program, 0));
 }
