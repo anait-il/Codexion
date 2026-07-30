@@ -18,16 +18,16 @@ void	assign_dongles(t_coder *coder, t_program *program, int counter)
 	coder->right = &program->dongles[counter % program->data.number_of_coders];
 }
 
-static int  init_dongle_param(t_dongle *dongle, int id, t_program *program)
+static void	init_dongle_param(t_dongle *dongle, int id, t_program *program)
 {
-    pthread_mutex_init(&dongle->lock, NULL);
-    pthread_cond_init(&dongle->cond, NULL);
-    dongle->id = id;
-    dongle->release_time = 0;
-    dongle->available = true;
-    dongle->heap.size = 0;
-    dongle->heap.program = program;
-    dongle->heap.capacity = program->data.number_of_coders;
+	pthread_mutex_init(&dongle->lock, NULL);
+	pthread_cond_init(&dongle->cond, NULL);
+	dongle->id = id;
+	dongle->release_time = 0;
+	dongle->available = true;
+	dongle->heap.size = 0;
+	dongle->heap.program = program;
+	dongle->heap.capacity = program->data.number_of_coders;
 }
 
 int	setup_dongles(t_program *program)
@@ -53,5 +53,3 @@ int	setup_dongles(t_program *program)
 	}
 	return (0);
 }
-
-

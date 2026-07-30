@@ -1,0 +1,59 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   dongle_utils.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/30 18:55:57 by anait-il          #+#    #+#             */
+/*   Updated: 2026/07/30 19:03:03 by anait-il         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "codexion.h"
+
+int	can_take(t_dongle *dongle, t_coder *coder)
+{
+	long	now;
+
+	if (!is_running(coder->program))
+		return (0);
+	if (!dongle->available)
+		return (1);
+	now = get_time_ms();
+	if (now - dongle->release_time < coder->program->data.dongle_cooldown)
+		return (1);
+	if (heap_top(&dongle->heap) != coder)
+		return (1);
+	return (0);
+}
+
+void	assign_order(t_coder *coder, t_dongle *first, t_dongle *second)
+{
+	if (coder->id % 2 == 0)
+	{
+		first = coder->left;
+		second = coder->right;
+	}
+	else
+	{
+		first = coder->right;
+		second = coder->left;
+	}
+}
+
+void	release_dongles(t_coder *coder)
+{
+	if (!coder)
+		return ;
+	pthread_mutex_lock(&coder->left->lock);
+	coder->left->release_time = get_time_ms();
+	coder->left->available = true;
+	pthread_cond_broadcast(&coder->left->cond);
+	pthread_mutex_unlock(&coder->left->lock);
+	pthread_mutex_lock(&coder->right->lock);
+	coder->right->release_time = get_time_ms();
+	coder->right->available = true;
+	pthread_cond_broadcast(&coder->right->cond);
+	pthread_mutex_unlock(&coder->right->lock);
+}

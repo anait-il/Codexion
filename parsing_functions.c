@@ -1,22 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   atoi_function.c                                    :+:      :+:    :+:   */
+/*   parsing_functions.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 14:36:12 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/29 12:37:19 by abdelkabir       ###   ########.fr       */
+/*   Updated: 2026/07/30 18:52:21 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "codexion.h"
 
-int parsing_error(char *msg, int ret)
+int	parsing_error(char *msg, int ret)
 {
-    fprintf(stderr, "%s\n", msg);
-    return (ret);
+	fprintf(stderr, "%s\n", msg);
+	return (ret);
 }
 
 long long	ft_atoi(char *str)
@@ -39,7 +38,7 @@ long long	ft_atoi(char *str)
 		res = res * 10 + (str[i] - '0');
 		if (res > 2147483647)
 		{
-            fprintf(stderr, "Error: argument exceeds INT_MAX '%s'\n", str);
+			fprintf(stderr, "Error: argument exceeds INT_MAX '%s'\n", str);
 			return (-1);
 		}
 		i++;
