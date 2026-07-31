@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   coder_routine1.c                                   :+:      :+:    :+:   */
+/*   coder_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:35:36 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 19:02:36 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/31 14:12:50 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static void	coder_cycle(t_coder *coder)
 		debug(coder);
 	if (is_running(coder->program))
 		refactore(coder);
-	//setup_schedular_times(coder);
+	setup_schedular_times(coder);
 }
 
 void	*coder_routine(void *arg)

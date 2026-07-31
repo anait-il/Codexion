@@ -6,114 +6,38 @@
 /*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 14:30:48 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/17 14:49:02 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/31 10:51:16 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <pthread.h>
 
-static int detect_end_compile(t_program *program)
+int	start_monitoring(t_program *program)
 {
-    int i;
-    
-    i = 0;
-    pthread_mutex_lock(&program->monitor_lock);
-    while (i < program->data.number_of_coders)
-    {
-        if (program->coders[i].compile_counter < program->data.number_of_compiles_required)
-        {
-            pthread_mutex_unlock(&program->monitor_lock);
-            return (1);
-        }
-        i++;
-    }
-    return (0);
+	int	status;
+
+	status = pthread_create(&program->monitor, NULL, monitor_routine, program);
+	if (status)
+	{
+		fprintf(stderr, "Error: monitor create failed with code %d\n", status);
+		free_dongles(program, program->data.number_of_coders);
+		return (status);
+	}
+	return (0);
 }
 
-static int    detect_burnout(t_program *program)
+void	stop_simulation(t_program *program)
 {
-    int     i;
-    long    now;
+	int	i;
 
-    i = 0;
-    pthread_mutex_lock(&program->monitor_lock);
-    now  = get_time_ms();
-    while (i < program->data.number_of_coders)
-    {
-        if ((now - program->coders[i].last_compile_time) >= program->data.time_to_burnout)
-        {
-            return (i + 1);
-        }
-        i++;
-    }
-    pthread_mutex_unlock(&program->monitor_lock);
-    return (0);
-}
-
-static void run_simulation(t_program *program)
-{
-    pthread_mutex_lock(&program->monitor_lock);
-    program->running = true;
-    program->started = true;
-    program->start_time = get_time_ms();
-    pthread_cond_broadcast(&program->barrier_cond);
-    while (program->ready_count < program->data.number_of_coders)
-        pthread_cond_wait(&program->ready_cond, &program->monitor_lock);
-    pthread_mutex_unlock(&program->monitor_lock);
-}
-
-static void    *monitor_routine(void *arg)
-{
-    t_program   *program;
-    int         i;
-    int         state;
-
-    i = 0;
-    program = (t_program*)arg;
-    run_simulation(program);
-    while (true)
-    {
-        usleep(100);
-        state = detect_burnout(program);
-        if (state)
-        {
-            log_burnout(program, state);
-            break;
-        }
-        if (!detect_end_compile(program))
-            break;
-    }
-    stop_simulation(program);
-    return (NULL);
-}
-
-int start_monitoring(t_program *program)
-{
-    int status;
-
-    status = pthread_create(&program->monitor, NULL, monitor_routine, program);
-    if (status)
-    {
-        fprintf(stderr, "Error: monitor create failed with code %d\n", status);
-        free_dongles(program, program->data.number_of_coders);
-        return (status);
-    }
-    return (0);
-}
-
-void    stop_simulation(t_program *program)
-{
-    int i;
-
-    i = 0;
-    program->running = false;
-    pthread_mutex_unlock(&program->monitor_lock);
-    while (i < program->data.number_of_coders)
-    {
-        pthread_mutex_lock(&program->dongles[i].lock);
-        pthread_cond_broadcast(&program->dongles[i].cond);
-        pthread_mutex_unlock(&program->dongles[i].lock);
-        i++;
-    }
+	i = 0;
+	program->running = false;
+	pthread_mutex_unlock(&program->monitor_lock);
+	while (i < program->data.number_of_coders)
+	{
+		pthread_mutex_lock(&program->dongles[i].lock);
+		pthread_cond_broadcast(&program->dongles[i].cond);
+		pthread_mutex_unlock(&program->dongles[i].lock);
+		i++;
+	}
 }

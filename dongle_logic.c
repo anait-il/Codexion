@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 12:29:37 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 19:02:30 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/31 14:41:15 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,14 @@ static int	acquire_first(t_dongle *first, t_coder *coder)
 	struct timespec	ts;
 
 	pthread_mutex_lock(&first->lock);
-	while (can_take(first, coder))
+	while (!can_take(first, coder))
 	{
 		wake_up = first->release_time + coder->program->data.dongle_cooldown;
 		ts.tv_sec = wake_up / 1000;
 		ts.tv_nsec = (wake_up % 1000) * 1000000L;
 		pthread_cond_timedwait(&first->cond, &first->lock, &ts);
 	}
+	printf("coder %d in first dongle at t=%ld\n", coder->id, get_elapsed_ms(coder->program->start_time));
 	return (0);
 }
 
@@ -37,7 +38,7 @@ static int	acquire_second(t_dongle *first, t_dongle *second, t_coder *coder)
 	long	wake_up;
 
 	pthread_mutex_lock(&second->lock);
-	if (can_take(second, coder))
+	if (!can_take(second, coder))
 	{
 		pthread_mutex_unlock(&second->lock);
 		pthread_mutex_unlock(&first->lock);
@@ -81,8 +82,8 @@ int	acquire_dongles(t_coder *coder)
 	t_dongle	*first;
 	t_dongle	*second;
 
-	assign_order(coder, first, second);
-	setup_schedular_times(coder);
+	assign_order(coder, &first, &second);
+	//setup_schedular_times(coder);
 	if (first == second)
 	{
 		acquire_first(first, coder);
@@ -94,6 +95,7 @@ int	acquire_dongles(t_coder *coder)
 	while (is_running(coder->program))
 	{
 		acquire_first(first, coder);
+		//printf("t=%ld, coder %d take dongles\n", get_elapsed_ms(coder->program->start_time),  coder->id);
 		if (!acquire_second(first, second, coder))
 			break ;
 		my_sleep(1, coder->program);

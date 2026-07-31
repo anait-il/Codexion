@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:55:57 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 19:03:03 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/31 14:22:08 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,28 +17,28 @@ int	can_take(t_dongle *dongle, t_coder *coder)
 	long	now;
 
 	if (!is_running(coder->program))
-		return (0);
-	if (!dongle->available)
 		return (1);
+	if (!dongle->available)
+		return (0);
 	now = get_time_ms();
 	if (now - dongle->release_time < coder->program->data.dongle_cooldown)
-		return (1);
+		return (0);
 	if (heap_top(&dongle->heap) != coder)
-		return (1);
-	return (0);
+		return (0);
+	return (1);
 }
 
-void	assign_order(t_coder *coder, t_dongle *first, t_dongle *second)
+void	assign_order(t_coder *coder, t_dongle **first, t_dongle **second)
 {
 	if (coder->id % 2 == 0)
 	{
-		first = coder->left;
-		second = coder->right;
+		*first = coder->left;
+		*second = coder->right;
 	}
 	else
 	{
-		first = coder->right;
-		second = coder->left;
+		*first = coder->right;
+		*second = coder->left;
 	}
 }
 

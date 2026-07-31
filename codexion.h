@@ -6,21 +6,20 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 19:17:38 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 19:17:43 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/07/31 10:58:56 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
- #define CODEXION_H
+# define CODEXION_H
 
-#include <pthread.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
-
+# include <pthread.h>
+# include <stdbool.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <sys/time.h>
+# include <unistd.h>
 
 typedef struct s_args
 {
@@ -104,9 +103,11 @@ void					assign_dongles(
 void					setup_schedular_times(t_coder *coder);
 void					assign_order(
 							t_coder *coder,
-							t_dongle *first,
-							t_dongle *second);
+							t_dongle **first,
+							t_dongle **second);
 int						can_take(t_dongle *dongle, t_coder *coder);
+void					bubble_down(t_heap *heap, char *schedular);
+void					bubble_up(t_heap *heap, char *schedular);
 
 //coders
 int						setup_coders(t_program *program);
@@ -135,5 +136,6 @@ void					destroy_mtx_cond(t_program *program);
 //monitor
 int						start_monitoring(t_program *program);
 void					stop_simulation(t_program *program);
+void					*monitor_routine(void *arg);
 
 #endif
