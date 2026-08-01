@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_functions.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 14:36:12 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 18:52:21 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/01 16:03:25 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ long long	ft_atoi(char *str)
 	sign = 1;
 	if (!str)
 		return (-1);
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-		i++;
 	if (str[i] == '-')
 		return (parsing_error("Error: negative numbers not allowed", -1));
+	if (str[i] == '+')
+		i++;
 	while (str[i] != '\0')
 	{
 		res = res * 10 + (str[i] - '0');

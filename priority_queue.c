@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   priority_queue.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:40:22 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/31 10:43:56 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/01 15:07:30 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	heap_push(t_heap *heap, t_coder *coder)
 {
-	t_coder	*arr;
 
 	if (!heap || !coder || !heap->arr)
 		return (1);
@@ -23,6 +22,8 @@ int	heap_push(t_heap *heap, t_coder *coder)
 		fprintf(stderr, "Heap overflow\n");
 		return (1);
 	}
+	heap->arr[heap->size] = coder;
+	heap->size++;
 	bubble_up(heap, coder->program->data.scheduler);
 	return (0);
 }

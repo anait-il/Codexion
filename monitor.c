@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 14:30:48 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/31 10:51:16 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/01 16:30:12 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	stop_simulation(t_program *program)
 	int	i;
 
 	i = 0;
-	program->running = false;
 	pthread_mutex_unlock(&program->monitor_lock);
 	while (i < program->data.number_of_coders)
 	{

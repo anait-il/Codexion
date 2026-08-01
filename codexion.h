@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 19:17:38 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/31 10:58:56 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/01 16:47:39 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ typedef struct s_coder
 	long				last_compile_time;
 	struct s_dongle		*left;
 	struct s_dongle		*right;
+	struct s_dongle		*first;
 	long				arrival_time;
 	long				deadline;
 	pthread_cond_t		cond;

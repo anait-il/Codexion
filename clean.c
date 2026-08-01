@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:51:15 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 19:03:53 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/01 16:40:46 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,15 +55,19 @@ int	clean_threads(t_program *program, int coders_counter)
 	int	i;
 	int	status;
 
-	i = 1;
+	i = 0;
 	if (coders_counter == -1)
 		return (0);
+	pthread_mutex_lock(&program->monitor_lock);
+	program->started = true;
+	pthread_cond_broadcast(&program->barrier_cond);
+	pthread_mutex_unlock(&program->monitor_lock);
 	while (i < coders_counter)
 	{
 		status = pthread_join(program->coders[i].thread, NULL);
 		if (status)
 		{
-			fprintf(stderr, "Thread %d join failed with code %d", i, status);
+			fprintf(stderr, "Thread %d join failed with code %d", i + 1, status);
 			break ;
 		}
 		i++;

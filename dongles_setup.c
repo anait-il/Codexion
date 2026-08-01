@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dongles.c                                          :+:      :+:    :+:   */
+/*   dongles_setup.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/13 12:12:05 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/30 06:33:40 by abdelkabir       ###   ########.fr       */
+/*   Updated: 2026/08/01 16:13:04 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	setup_dongles(t_program *program)
 	{
 		init_dongle_param(&program->dongles[i], i, program);
 		program->dongles[i].heap.arr = malloc(sizeof(t_coder *)
-				* program->data.number_of_coders);
+				* 2);
 		if (!program->dongles[i].heap.arr)
 		{
 			free_dongles(program, i);

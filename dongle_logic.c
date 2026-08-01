@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 12:29:37 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/31 14:41:15 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/01 15:05:18 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ static int	acquire_first(t_dongle *first, t_coder *coder)
 		ts.tv_nsec = (wake_up % 1000) * 1000000L;
 		pthread_cond_timedwait(&first->cond, &first->lock, &ts);
 	}
-	printf("coder %d in first dongle at t=%ld\n", coder->id, get_elapsed_ms(coder->program->start_time));
 	return (0);
 }
 
@@ -95,7 +94,6 @@ int	acquire_dongles(t_coder *coder)
 	while (is_running(coder->program))
 	{
 		acquire_first(first, coder);
-		//printf("t=%ld, coder %d take dongles\n", get_elapsed_ms(coder->program->start_time),  coder->id);
 		if (!acquire_second(first, second, coder))
 			break ;
 		my_sleep(1, coder->program);
