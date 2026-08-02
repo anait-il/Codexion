@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/30 15:54:59 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/02 12:02:45 by abdelkabir       ###   ########.fr       */
+/*   Updated: 2026/08/02 15:56:22 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ static int	init_program(t_program *program)
 
 	program->running = false;
 	program->started = false;
+	program->ready_count = 0;
 	status = pthread_mutex_init(&program->monitor_lock, NULL);
 	if (status)
 		return (1);
@@ -59,6 +60,6 @@ int	main(int ac, char *av[])
 		return (1);
 	}
 	if (pthread_join(program.monitor, NULL))
-		return (full_clean_exit(&program, 1));
+	    return (full_clean_exit(&program, 1));
 	return (full_clean_exit(&program, 0));
 }

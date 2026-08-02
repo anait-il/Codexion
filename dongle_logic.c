@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 12:29:37 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 15:05:18 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/02 21:06:50 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ static int	request_dongles(t_coder *coder, t_dongle *first, t_dongle *second)
 {
 	int	state;
 
+	setup_schedular_times(coder);
 	pthread_mutex_lock(&first->lock);
 	state = heap_push(&first->heap, coder);
 	pthread_mutex_unlock(&first->lock);
@@ -82,15 +83,15 @@ int	acquire_dongles(t_coder *coder)
 	t_dongle	*second;
 
 	assign_order(coder, &first, &second);
-	//setup_schedular_times(coder);
+	if (request_dongles(coder, first, second))
+		return (1);
 	if (first == second)
 	{
 		acquire_first(first, coder);
+        pthread_mutex_unlock(&first->lock);
 		log_state(heap_pop(&first->heap), "has taken a dongle\n");
 		return (1);
 	}
-	if (request_dongles(coder, first, second))
-		return (1);
 	while (is_running(coder->program))
 	{
 		acquire_first(first, coder);
@@ -100,7 +101,8 @@ int	acquire_dongles(t_coder *coder)
 	}
 	if (!is_running(coder->program))
 		return (1);
-	log_state(heap_pop(&first->heap), "has taken a dongle\n");
-	log_state(heap_pop(&second->heap), "has taken a dongle\n");
+	pop(coder, first, second);
+	log_state(coder, "has taken a dongle\n");
+	log_state(coder, "has taken a dongle\n");
 	return (0);
 }

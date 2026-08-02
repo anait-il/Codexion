@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:35:36 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 16:32:31 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/02 16:00:02 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ static void	coder_cycle(t_coder *coder)
 		debug(coder);
 	if (is_running(coder->program))
 		refactore(coder);
-	setup_schedular_times(coder);
 }
 
 void	*coder_routine(void *arg)

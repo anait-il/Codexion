@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 19:17:38 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 16:47:39 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/02 16:44:57 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ void					assign_order(
 int						can_take(t_dongle *dongle, t_coder *coder);
 void					bubble_down(t_heap *heap, char *schedular);
 void					bubble_up(t_heap *heap, char *schedular);
+void					pop(t_coder *coder, t_dongle *first, t_dongle *second);
 
 //coders
 int						setup_coders(t_program *program);

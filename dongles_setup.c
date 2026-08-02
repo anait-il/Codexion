@@ -27,7 +27,7 @@ static void	init_dongle_param(t_dongle *dongle, int id, t_program *program)
 	dongle->available = true;
 	dongle->heap.size = 0;
 	dongle->heap.program = program;
-	dongle->heap.capacity = program->data.number_of_coders;
+	dongle->heap.capacity = 2;
 }
 
 int	setup_dongles(t_program *program)

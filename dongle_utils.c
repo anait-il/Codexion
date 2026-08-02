@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:55:57 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 16:48:53 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/02 16:44:11 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@ void	assign_order(t_coder *coder, t_dongle **first, t_dongle **second)
 		*first = coder->right;
 		*second = coder->left;
 	}
+	//pthread_mutex_lock(&(*first->lock));
+	//coder->first = *first;
+	//pthread_mutex_unlock(&(*first->lock));
 }
 
 void	release_dongles(t_coder *coder)
@@ -56,4 +59,14 @@ void	release_dongles(t_coder *coder)
 	coder->right->available = true;
 	pthread_cond_broadcast(&coder->right->cond);
 	pthread_mutex_unlock(&coder->right->lock);
+}
+
+void	pop(t_coder *coder, t_dongle *first, t_dongle *second)
+{
+	pthread_mutex_lock(&first->lock);
+	heap_pop(&first->heap);
+	pthread_mutex_unlock(&first->lock);
+	pthread_mutex_lock(&second->lock);
+	heap_pop(&second->heap);
+	pthread_mutex_unlock(&second->lock);
 }
