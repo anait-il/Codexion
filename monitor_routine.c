@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor_routine.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
+/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:50:19 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/31 14:29:10 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/02 12:35:13 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ static int	detect_end_compile(t_program *program)
 		}
 		i++;
 	}
+    program->running = false;
+    pthread_mutex_unlock(&program->monitor_lock);
 	return (0);
 }
 
@@ -44,6 +46,8 @@ static int	detect_burnout(t_program *program)
 		if ((now - program->coders[i].last_compile_time) >=	\
 			program->data.time_to_burnout)
 		{
+            program->running = false;
+            pthread_mutex_unlock(&program->monitor_lock);
 			return (i + 1);
 		}
 		i++;

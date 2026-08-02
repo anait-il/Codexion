@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
+/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/30 15:54:59 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 16:30:34 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/02 12:02:45 by abdelkabir       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ int	main(int ac, char *av[])
 	state = parsing(ac, av, &program);
 	if (state)
 		return (1);
-	program.running = false;
 	if (init_program(&program))
 		return (1);
 	if (setup_dongles(&program))
