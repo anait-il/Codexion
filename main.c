@@ -3,27 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/30 15:54:59 by anait-il          #+#    #+#             */
-/*   Updated: 2026/06/30 15:54:59 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 19:10:45 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <pthread.h>
 
-int init_mutex(t_program *program)
+static int	init_program(t_program *program)
 {
-    int status;
+	int	status;
 
-    status = pthread_mutex_init(&program->monitor_lock, NULL);
-    if (status)
-        return (1);
-    status = pthread_mutex_init(&program->print_lock, NULL);
-    if (status)
-        return (1);
-    return (0);
+	program->running = false;
+	program->started = false;
+	status = pthread_mutex_init(&program->monitor_lock, NULL);
+	if (status)
+		return (1);
+	status = pthread_mutex_init(&program->print_lock, NULL);
+	if (status)
+		return (1);
+	return (0);
+}
+
+static int	full_clean_exit(t_program *program, int status)
+{
+	destroy_mtx_cond(program);
+	clean_up(program);
+	return (status);
 }
 
 int	main(int ac, char *av[])
@@ -31,28 +39,25 @@ int	main(int ac, char *av[])
 	int			state;
 	t_program	program;
 
-    program.running = false;
 	state = parsing(ac, av, &program);
-	if (state == 1)
+	if (state)
 		return (1);
-    state = init_mutex(&program);
-    state = setup_dongles(&program);
-    if (state)
-        return (7);
+	if (init_program(&program))
+		return (1);
+	if (setup_dongles(&program))
+		return (1);
 	state = setup_coders(&program);
 	if (state)
 	{
 		clean_threads(&program, state);
 		return (8);
 	}
-    state = join_coders(program);
-	if (state)
+	if (join_coders(&program))
 	{
 		clean_up(&program);
 		return (1);
 	}
-    destroy_mtx_cond(&program);
-    printf("########### program is finish ##############\n");
-    clean_up(&program);
-    return (0);
+	if (pthread_join(program.monitor, NULL))
+		return (full_clean_exit(&program, 1));
+	return (full_clean_exit(&program, 0));
 }
