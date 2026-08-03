@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:35:36 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/02 16:00:02 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 19:11:29 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static void	compile(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->program->monitor_lock);
 	coder->compile_counter++;
-	coder->last_compile_time = get_time_ms();
+	coder->last_compile_time = get_elapsed_ms(coder->program->start_time);
 	pthread_mutex_unlock(&coder->program->monitor_lock);
 	log_state(coder, "is compiling\n");
 	my_sleep(coder->program->data.time_to_compile, coder->program);

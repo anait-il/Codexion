@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor_routine.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:50:19 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/02 12:35:13 by abdelkabir       ###   ########.fr       */
+/*   Updated: 2026/08/03 19:12:35 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,26 +28,25 @@ static int	detect_end_compile(t_program *program)
 		}
 		i++;
 	}
-    program->running = false;
-    pthread_mutex_unlock(&program->monitor_lock);
+	program->running = false;
+	pthread_mutex_unlock(&program->monitor_lock);
 	return (0);
 }
 
 static int	detect_burnout(t_program *program)
 {
 	int		i;
-	long	now;
 
 	i = 0;
 	pthread_mutex_lock(&program->monitor_lock);
-	now = get_time_ms();
 	while (i < program->data.number_of_coders)
 	{
-		if ((now - program->coders[i].last_compile_time) >=	\
-			program->data.time_to_burnout)
+		if ((get_elapsed_ms(program->start_time) > \
+			program->coders[i].last_compile_time + \
+			program->data.time_to_burnout))
 		{
-            program->running = false;
-            pthread_mutex_unlock(&program->monitor_lock);
+			program->running = false;
+			pthread_mutex_unlock(&program->monitor_lock);
 			return (i + 1);
 		}
 		i++;
@@ -63,8 +62,6 @@ static void	run_simulation(t_program *program)
 	program->started = true;
 	program->start_time = get_time_ms();
 	pthread_cond_broadcast(&program->barrier_cond);
-	while (program->ready_count < program->data.number_of_coders)
-		pthread_cond_wait(&program->ready_cond, &program->monitor_lock);
 	pthread_mutex_unlock(&program->monitor_lock);
 }
 
@@ -79,6 +76,7 @@ void	*monitor_routine(void *arg)
 	run_simulation(program);
 	while (true)
 	{
+		usleep(500);
 		state = detect_burnout(program);
 		if (state)
 		{
@@ -87,7 +85,6 @@ void	*monitor_routine(void *arg)
 		}
 		if (!detect_end_compile(program))
 			break ;
-		usleep(100);
 	}
 	stop_simulation(program);
 	return (NULL);

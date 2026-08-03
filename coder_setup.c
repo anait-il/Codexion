@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/27 01:36:10 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 16:23:04 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 18:17:15 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	setup_coders(t_program *program)
 		{
 			fprintf(stderr, "Error: Thread %d creation failed with code %d\n", i
 				+ 1, status);
-			return (i + 1);
+			return (i);
 		}
 		i++;
 	}

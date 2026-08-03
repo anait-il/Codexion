@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:55:57 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/02 16:44:11 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 19:17:05 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 int	can_take(t_dongle *dongle, t_coder *coder)
 {
 	long	now;
+	t_coder	*top;
 
 	if (!is_running(coder->program))
 		return (1);
@@ -40,9 +41,6 @@ void	assign_order(t_coder *coder, t_dongle **first, t_dongle **second)
 		*first = coder->right;
 		*second = coder->left;
 	}
-	//pthread_mutex_lock(&(*first->lock));
-	//coder->first = *first;
-	//pthread_mutex_unlock(&(*first->lock));
 }
 
 void	release_dongles(t_coder *coder)
@@ -69,4 +67,11 @@ void	pop(t_coder *coder, t_dongle *first, t_dongle *second)
 	pthread_mutex_lock(&second->lock);
 	heap_pop(&second->heap);
 	pthread_mutex_unlock(&second->lock);
+}
+
+void	only_one_coder(t_dongle *dongle, t_coder *coder)
+{
+	acquire_first(dongle, coder);
+	pthread_mutex_unlock(&dongle->lock);
+	log_state(heap_pop(&dongle->heap), "has taken a dongle\n");
 }

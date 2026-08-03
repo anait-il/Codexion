@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 12:29:37 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/02 21:06:50 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 19:17:45 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,9 @@ static int	acquire_first(t_dongle *first, t_coder *coder)
 	t_coder			*status;
 	long			wake_up;
 	struct timespec	ts;
+	long			start;
 
+	start = coder->program->start_time;
 	pthread_mutex_lock(&first->lock);
 	while (!can_take(first, coder))
 	{
@@ -87,9 +89,7 @@ int	acquire_dongles(t_coder *coder)
 		return (1);
 	if (first == second)
 	{
-		acquire_first(first, coder);
-        pthread_mutex_unlock(&first->lock);
-		log_state(heap_pop(&first->heap), "has taken a dongle\n");
+		only_one_coder(first, coder);
 		return (1);
 	}
 	while (is_running(coder->program))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_join.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abdelkabir <abdelkabir@student.42.fr>      +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:34:57 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/02 11:51:48 by abdelkabir       ###   ########.fr       */
+/*   Updated: 2026/08/03 19:11:46 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,7 @@ void	wait_for_start(t_coder *coder)
 	while (!coder->program->started)
 		pthread_cond_wait(&coder->program->barrier_cond,
 			&coder->program->monitor_lock);
-	coder->last_compile_time = coder->program->start_time;
-	coder->program->ready_count++;
-	if (coder->program->ready_count == coder->program->data.number_of_coders)
-		pthread_cond_signal(&coder->program->ready_cond);
+	coder->last_compile_time = get_elapsed_ms(coder->program->start_time);
 	pthread_mutex_unlock(&coder->program->monitor_lock);
 }
 

@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:40:22 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 15:07:30 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 19:02:48 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	heap_push(t_heap *heap, t_coder *coder)
 {
-
 	if (!heap || !coder || !heap->arr)
 		return (1);
 	if (heap->size >= heap->capacity)

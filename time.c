@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   time.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anait-il <your@mail.com>                   +#+  +:+       +#+        */
+/*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:59:53 by anait-il          #+#    #+#             */
-/*   Updated: 2026/07/31 10:59:53 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 17:07:54 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	my_sleep(long time, t_program *program)
 	start = get_time_ms();
 	while (get_time_ms() - start < time)
 	{
-		usleep((time / 20) * 1000);
+		usleep(500);
 		if (!is_running(program))
 			return ;
 	}

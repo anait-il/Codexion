@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:51:15 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/01 16:40:46 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/03 19:13:11 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,8 @@ int	clean_threads(t_program *program, int coders_counter)
 		status = pthread_join(program->coders[i].thread, NULL);
 		if (status)
 		{
-			fprintf(stderr, "Thread %d join failed with code %d", i + 1, status);
+			fprintf(stderr,
+				"Thread %d join failed with code %d", i + 1, status);
 			break ;
 		}
 		i++;
