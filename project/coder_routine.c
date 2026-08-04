@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:35:36 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 19:11:29 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/04 15:53:13 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,8 @@ static void	coder_cycle(t_coder *coder)
 
 void	*coder_routine(void *arg)
 {
-	bool		running;
 	t_coder		*coder;
 	int			state;
-	static int	counter = 0;
 
 	coder = (t_coder *)arg;
 	wait_for_start(coder);

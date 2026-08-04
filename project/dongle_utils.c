@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:55:57 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 19:17:05 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/04 15:54:21 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 int	can_take(t_dongle *dongle, t_coder *coder)
 {
 	long	now;
-	t_coder	*top;
 
 	if (!is_running(coder->program))
 		return (1);
@@ -59,7 +58,7 @@ void	release_dongles(t_coder *coder)
 	pthread_mutex_unlock(&coder->right->lock);
 }
 
-void	pop(t_coder *coder, t_dongle *first, t_dongle *second)
+void	pop(t_dongle *first, t_dongle *second)
 {
 	pthread_mutex_lock(&first->lock);
 	heap_pop(&first->heap);

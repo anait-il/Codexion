@@ -6,16 +6,14 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 12:29:37 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 19:17:45 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/04 15:56:00 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static int	acquire_first(t_dongle *first, t_coder *coder)
+int	acquire_first(t_dongle *first, t_coder *coder)
 {
-	int				state;
-	t_coder			*status;
 	long			wake_up;
 	struct timespec	ts;
 	long			start;
@@ -34,10 +32,6 @@ static int	acquire_first(t_dongle *first, t_coder *coder)
 
 static int	acquire_second(t_dongle *first, t_dongle *second, t_coder *coder)
 {
-	int		state;
-	t_coder	*status;
-	long	wake_up;
-
 	pthread_mutex_lock(&second->lock);
 	if (!can_take(second, coder))
 	{
@@ -101,7 +95,7 @@ int	acquire_dongles(t_coder *coder)
 	}
 	if (!is_running(coder->program))
 		return (1);
-	pop(coder, first, second);
+	pop(first, second);
 	log_state(coder, "has taken a dongle\n");
 	log_state(coder, "has taken a dongle\n");
 	return (0);
