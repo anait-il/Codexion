@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/27 01:36:10 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/04 11:23:00 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/05 23:57:22 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,26 @@ static void	init_coder_param(t_coder *coder, t_program *program, int i)
 	coder->compile_counter = 0;
 }
 
-static void	program_cond_init(t_program *program)
+static int	program_cond_init(t_program *program)
 {
-	pthread_cond_init(&program->barrier_cond, NULL);
-	pthread_cond_init(&program->ready_cond, NULL);
+	program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
+	if (!program->coders)
+	{
+		fprintf(stderr, "Error: coders allocation failed\n");
+		dongles_destroy(program, program->data.number_of_coders);
+		destroy_program_lock(program);
+		free_dongles(program, program->data.number_of_coders);
+		return (1);
+	}
+	if (pthread_cond_init(&program->barrier_cond, NULL))
+	{
+		dongles_destroy(program, program->data.number_of_coders);
+		destroy_program_lock(program);
+		free_dongles(program, program->data.number_of_coders);
+		free(program->coders);
+		return (1);
+	}
+	return (0);
 }
 
 int	setup_coders(t_program *program)
@@ -53,10 +69,8 @@ int	setup_coders(t_program *program)
 	int			status;
 
 	i = 0;
-	program->coders = malloc(sizeof(t_coder) * program->data.number_of_coders);
-	if (!program->coders)
+	if (program_cond_init(program))
 		return (-1);
-	program_cond_init(program);
 	while (i < program->data.number_of_coders)
 	{
 		init_coder_param(&program->coders[i], program, i);
@@ -66,11 +80,12 @@ int	setup_coders(t_program *program)
 		{
 			fprintf(stderr, "Error: Thread %d creation failed with code %d\n", i
 				+ 1, status);
+			dongles_destroy(program, program->data.number_of_coders);
 			return (i);
 		}
 		i++;
 	}
 	if (start_monitoring(program))
-		return (1);
+		return (i);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 19:17:38 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/04 15:54:41 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/05 23:14:24 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,13 @@ typedef struct s_coder
 	long				last_compile_time;
 	struct s_dongle		*left;
 	struct s_dongle		*right;
-	struct s_dongle		*first;
 	long				arrival_time;
 	long				deadline;
-	pthread_cond_t		cond;
 }						t_coder;
 
 typedef struct s_dongle
 {
-	long				available;
+	bool				available;
 	int					id;
 	struct s_heap		heap;
 	pthread_mutex_t		lock;
@@ -71,7 +69,6 @@ typedef struct s_program
 {
 	bool				running;
 	bool				started;
-	int					ready_count;
 	pthread_t			monitor;
 	long				start_time;
 	t_args				data;
@@ -79,7 +76,6 @@ typedef struct s_program
 	t_dongle			*dongles;
 	pthread_mutex_t		monitor_lock;
 	pthread_cond_t		barrier_cond;
-	pthread_cond_t		ready_cond;
 	pthread_mutex_t		print_lock;
 }						t_program;
 
@@ -112,6 +108,7 @@ void					bubble_up(t_heap *heap, char *schedular);
 void					pop(t_dongle *first, t_dongle *second);
 void					only_one_coder(t_dongle *dongle, t_coder *coder);
 int						acquire_first(t_dongle *first, t_coder *coder);
+void					dongles_destroy(t_program *program, int count);
 
 //coders
 int						setup_coders(t_program *program);
@@ -141,5 +138,6 @@ void					destroy_mtx_cond(t_program *program);
 int						start_monitoring(t_program *program);
 void					stop_simulation(t_program *program);
 void					*monitor_routine(void *arg);
+void					destroy_program_lock(t_program *program);
 
 #endif

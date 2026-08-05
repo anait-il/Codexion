@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/30 15:54:59 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 19:10:45 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 00:07:31 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,10 @@ static int	init_program(t_program *program)
 		return (1);
 	status = pthread_mutex_init(&program->print_lock, NULL);
 	if (status)
+	{
+		pthread_mutex_destroy(&program->monitor_lock);
 		return (1);
+	}
 	return (0);
 }
 
@@ -32,6 +35,12 @@ static int	full_clean_exit(t_program *program, int status)
 	destroy_mtx_cond(program);
 	clean_up(program);
 	return (status);
+}
+
+void	destroy_program_lock(t_program *program)
+{
+	pthread_mutex_destroy(&program->print_lock);
+	pthread_mutex_destroy(&program->monitor_lock);
 }
 
 int	main(int ac, char *av[])
@@ -50,7 +59,7 @@ int	main(int ac, char *av[])
 	if (state)
 	{
 		clean_threads(&program, state);
-		return (8);
+		return (1);
 	}
 	if (join_coders(&program))
 	{

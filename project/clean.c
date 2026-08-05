@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:51:15 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 19:13:11 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 00:03:21 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void	destroy_mtx_cond(t_program *program)
 	i = 0;
 	pthread_mutex_destroy(&program->print_lock);
 	pthread_mutex_destroy(&program->monitor_lock);
+	pthread_cond_destroy(&program->barrier_cond);
 	while (i < program->data.number_of_coders)
 	{
 		pthread_mutex_destroy(&program->dongles[i].lock);
@@ -48,6 +49,19 @@ int	clean_up(t_program *program)
 	free_dongles(program, program->data.number_of_coders);
 	free(program->coders);
 	return (0);
+}
+
+void	dongles_destroy(t_program *program, int count)
+{
+	int	i;
+
+	i = 0;
+	while (i < count)
+	{
+		pthread_mutex_destroy(&program->dongles[i].lock);
+		pthread_cond_destroy(&program->dongles[i].cond);
+		i++;
+	}
 }
 
 int	clean_threads(t_program *program, int coders_counter)
@@ -73,6 +87,8 @@ int	clean_threads(t_program *program, int coders_counter)
 		}
 		i++;
 	}
+	destroy_program_lock(program);
+	pthread_cond_destroy(&program->barrier_cond);
 	clean_up(program);
 	return (0);
 }

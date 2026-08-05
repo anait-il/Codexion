@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:50:19 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 19:12:35 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/05 17:01:12 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,14 @@ static int	detect_end_compile(t_program *program)
 static int	detect_burnout(t_program *program)
 {
 	int		i;
+	long	now;
 
 	i = 0;
 	pthread_mutex_lock(&program->monitor_lock);
+	now = get_elapsed_ms(program->start_time);
 	while (i < program->data.number_of_coders)
 	{
-		if ((get_elapsed_ms(program->start_time) > \
-			program->coders[i].last_compile_time + \
+		if ((now >= program->coders[i].last_compile_time + \
 			program->data.time_to_burnout))
 		{
 			program->running = false;
@@ -76,7 +77,7 @@ void	*monitor_routine(void *arg)
 	run_simulation(program);
 	while (true)
 	{
-		usleep(500);
+		usleep(100);
 		state = detect_burnout(program);
 		if (state)
 		{

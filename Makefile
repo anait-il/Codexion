@@ -8,7 +8,7 @@ FILE_DIR = project/
 
 FILES = $(addprefix $(FILE_DIR),$(FILE))
 
-FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread -g
+FLAGS = -Wall -Werror -Wextra -pthread
 
 OBJ = $(FILES:%.c=%.o)
 

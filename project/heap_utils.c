@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:43:00 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/03 18:46:38 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/05 00:12:51 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int	has_priority(t_coder *a, t_coder *b, char *schedular)
 	else
 	{
 		if (a->arrival_time - b->arrival_time != 0)
-			return (a->arrival_time < b->arrival_time);
+			return (a->arrival_time > b->arrival_time);
 		return (tie_breaker(a, b));
 	}
 }
