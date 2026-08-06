@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 14:36:12 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/05 01:09:27 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 15:57:56 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,17 @@ int	parsing_error(char *msg, int ret)
 long long	ft_atoi(char *str)
 {
 	int			i;
-	int			sign;
 	long long	res;
 
 	i = 0;
 	res = 0;
-	sign = 1;
 	if (!str)
 		return (-1);
 	if (str[i] == '-')
-		return (parsing_error("Error: negative numbers not allowed", -1));
+	{
+		fprintf(stderr, "negative number %s\n", str);
+		return (-1);
+	}
 	if (str[i] == '+')
 		i++;
 	while (str[i] != '\0')

@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/13 12:12:05 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/05 23:31:47 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 15:03:05 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static int	init_dongle_param(t_dongle *dongle, int id, t_program *program)
 	{
 		destroy_program_lock(program);
 		dongles_destroy(program, id);
-		free_dongle(program, id);
+		free_dongles(program, id);
 		return (1);
 	}
 	if (pthread_cond_init(&dongle->cond, NULL))
@@ -32,7 +32,7 @@ static int	init_dongle_param(t_dongle *dongle, int id, t_program *program)
 		destroy_program_lock(program);
 		pthread_mutex_destroy(&dongle->lock);
 		dongles_destroy(program, id);
-		free_dongle(program, id);
+		free_dongles(program, id);
 		return (1);
 	}
 	dongle->id = id;

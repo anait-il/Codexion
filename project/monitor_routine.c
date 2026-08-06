@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 10:50:19 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/05 17:01:12 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 15:33:49 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,8 @@ static void	run_simulation(t_program *program)
 void	*monitor_routine(void *arg)
 {
 	t_program	*program;
-	int			i;
 	int			state;
 
-	i = 0;
 	program = (t_program *)arg;
 	run_simulation(program);
 	while (true)

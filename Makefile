@@ -18,7 +18,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@$(CC) $(FLAGS) $(OBJ) -o $(NAME)
  
-%.o: %.c $(FILE_DIR)/codexion.h
+%.o: %.c $(FILE_DIR)codexion.h
 	@$(CC) $(FLAGS) -c $< -o $@
 
 clean:

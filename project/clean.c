@@ -6,7 +6,7 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/30 18:51:15 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/06 00:03:21 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 15:32:54 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,6 @@ void	destroy_mtx_cond(t_program *program)
 
 int	clean_up(t_program *program)
 {
-	int	i;
-
-	i = 0;
 	free_dongles(program, program->data.number_of_coders);
 	free(program->coders);
 	return (0);
