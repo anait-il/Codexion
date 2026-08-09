@@ -6,17 +6,11 @@
 /*   By: anait-il <anait-il@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 14:36:12 by anait-il          #+#    #+#             */
-/*   Updated: 2026/08/06 15:57:56 by anait-il         ###   ########.fr       */
+/*   Updated: 2026/08/06 16:00:59 by anait-il         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-int	parsing_error(char *msg, int ret)
-{
-	fprintf(stderr, "%s\n", msg);
-	return (ret);
-}
 
 long long	ft_atoi(char *str)
 {
@@ -29,7 +23,7 @@ long long	ft_atoi(char *str)
 		return (-1);
 	if (str[i] == '-')
 	{
-		fprintf(stderr, "negative number %s\n", str);
+		fprintf(stderr, "Error: negative numbers not allowed '%s'\n", str);
 		return (-1);
 	}
 	if (str[i] == '+')
