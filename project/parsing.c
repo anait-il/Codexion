@@ -40,6 +40,8 @@ static int	is_valid(char *av[])
 				return (i);
 			y++;
 		}
+		if (strlen(av[i]) == 0)
+			return (i);
 		i++;
 	}
 	return (0);
@@ -91,7 +93,7 @@ int	parsing(int ac, char *av[], t_program *program)
 	parsing_stat = is_valid(av);
 	if (parsing_stat)
 	{
-		fprintf(stderr, "Error: invalid argument '%s'", av[parsing_stat]);
+		fprintf(stderr, "Error: invalid argument '%s'\n", av[parsing_stat]);
 		return (1);
 	}
 	if (schedular_check(av[8]))
